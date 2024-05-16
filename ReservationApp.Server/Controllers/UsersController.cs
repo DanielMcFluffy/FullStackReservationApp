@@ -42,8 +42,7 @@ namespace ReservationApp.Server.Controllers
             return user;
         }
         //signup
-        [Route("/signup")]
-        [HttpPost]
+        [HttpPost("/signup")]
         public async Task<IActionResult> Signup(User newUser)
         {
             var user = await _usersService.GetByUsernameAsync(newUser.username);
@@ -62,17 +61,6 @@ namespace ReservationApp.Server.Controllers
 
             return CreatedAtAction(nameof(Get), successResponse);
         }
-        //TODO: add a bulk write method -- refer to usersService as well
-
-        ////bulk write 
-        //[HttpPost]
-
-        //public async Task<IActionResult> Post(List<User> users)
-        //{
-        //    await _usersService.CreateBulkAsync(users);
-
-        //    return NoContent();
-        //}
 
         //[HttpPut("{id}")]
         //public async Task<IActionResult> Update(string id, User updatedUser)
@@ -96,14 +84,16 @@ namespace ReservationApp.Server.Controllers
         //[HttpPost("/login")]
         //public async Task<ActionResult<IAuthData>> Login(User loginUser)
         //{
-        //    var user = _usersService.GetAsync(loginUser.username);
+        //    var user = _usersService.GetByUsernameAsync(loginUser.username);
 
-        //    if(user == null)
+        //    if (user == null)
         //    {
         //        return Unauthorized(new { Message = "Authentication failed" });
         //    }
 
         //    var newToken = SHA256.Create();
+
+            
 
 
         //}
