@@ -1,0 +1,20 @@
+.calendar-form-field {
+  width: 100%;
+  /* text-align: right; */
+}
+
+@media (max-width: 1400px) {
+  .calendar-form-field {
+    width: 300px;
+  }
+}
+
+@media (max-width: 575px) {
+  .calendar-form-field {
+    width: 100%;
+  }
+
+  mat-datepicker-toggle {
+    margin-left: 2rem;
+  }
+}

@@ -1,0 +1,86 @@
+<div class="container justify-content-center p-5">
+  <h3>We're sorry you have to cancel.</h3>
+  <p class="lead">Please give us feedback so we can improve.</p>
+  <div class="container">
+    <form #cancelInput="ngForm" (ngSubmit)="onSubmit(cancelInput.value)">
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="cancelReason"
+          id="changeOfMind"
+          value="Change of Mind"
+          ngModel
+          checked
+        />
+        <label class="form-check-label" for="changeOfMind">
+          Change of mind
+        </label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="cancelReason"
+          id="betterDealElsewhere"
+          value="Better deal elsewhere"
+          ngModel
+        />
+        <label class="form-check-label" for="betterDealElsewhere">
+          Found a better deal elsewhere
+        </label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="cancelReason"
+          id="DislikedListing"
+          value="Dislike Listing"
+          ngModel
+        />
+        <label class="form-check-label" for="DislikedListing">
+          Disliked the listing
+        </label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="cancelReason"
+          id="otherReason"
+          value="Other reasons"
+          ngModel
+        />
+        <label class="form-check-label" for="otherReason">
+          Other reasons:
+        </label>
+        <br />
+        <textarea
+          class="form-control mt-2"
+          id="textReason"
+          rows="3"
+          placeholder="Your feedback helps us improve."
+          name="otherReasonText"
+          ngModel
+          [disabled]="
+            !cancelInput.value.cancelReason ||
+            cancelInput.value.cancelReason !== 'Other reasons'
+          "
+        ></textarea>
+      </div>
+      <div class="text-end mt-3">
+        <button
+          [disabled]="
+            !cancelInput.value.cancelReason ||
+            (cancelInput.value.cancelReason === 'Other reasons' &&
+              !cancelInput.value.otherReasonText)
+          "
+          class="btn btn-danger"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

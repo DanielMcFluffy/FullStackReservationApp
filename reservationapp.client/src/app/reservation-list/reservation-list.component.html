@@ -1,0 +1,48 @@
+<app-home></app-home>
+
+<h2 class="mt-5">Reservation List</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Reservation Name</th>
+      <th>Listing Id</th>
+      <th>Email</th>
+      <th>Check-In</th>
+      <th>Check-Out</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let reservation of reservations">
+      <td>{{ reservation.guestname }}</td>
+      <td>{{ reservation.listing_id }}</td>
+      <td>{{ reservation.guestemail }}</td>
+      <td>{{ reservation.checkindate | date }}</td>
+      <td>{{ reservation.checkoutdate | date }}</td>
+      <td>
+        <button
+          class="btn btn-danger btn-sm m-2"
+          (click)="onDelete(reservation)"
+        >
+          Delete
+        </button>
+        <button
+          class="btn btn-secondary btn-sm mx-2"
+          [routerLink]="['/edit', reservation.id]"
+        >
+          Edit
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+@if (isLoading) {
+<div>
+  <p>Loading...</p>
+</div>
+} @else if (!reservations.length && !isLoading) {
+<div>
+  <p>No reservations available</p>
+</div>
+
+}

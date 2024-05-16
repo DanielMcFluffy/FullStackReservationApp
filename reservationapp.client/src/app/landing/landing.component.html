@@ -1,0 +1,16 @@
+<div class="row">
+  <div
+    *ngFor="let listing of filteredListings"
+    [ngClass]="{
+      'col-4': screenWidthBelow1200,
+      'col-6': screenWidthBelow1000,
+      'col-12': screenWidthBelow768,
+      'col-3':
+        !screenWidthBelow1200 && !screenWidthBelow1000 && !screenWidthBelow768
+    }"
+  >
+    <a [routerLink]="['/listing/' + listing.id]">
+      <app-listing-item [listing]="listing"></app-listing-item>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,508 @@
+//import express into node js
+let express = require("express");
+//import path
+let path = require("path");
+//create an instance of an express application
+let app = express();
+//enable CORS
+const cors = require("cors");
+const { Pool } = require("pg");
+require("dotenv").config();
+const { DATABASE_URL, SECRET_KEY, REFRESH_SECRET_KEY } = process.env;
+//imports for auth
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+//for parsing incoming cookies sent by the req object
+const cookieParser = require("cookie-parser");
+
+app.use(cors());
+app.use(cookieParser());
+app.use(express.json());
+
+const pool = new Pool({
+  connectionString: DATABASE_URL,
+  ssl: {
+    require: true,
+  },
+});
+
+async function getPostgresVersion() {
+  const client = await pool.connect();
+  try {
+    const response = await client.query("SELECT version()");
+    console.log(response.rows[0]);
+  } finally {
+    client.release();
+  }
+}
+
+getPostgresVersion();
+
+//signup endpoint
+app.post("/signup", async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { username, password } = req.body;
+    //hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    //check for username
+    const userResult = await client.query(
+      "SELECT * FROM users WHERE username = $1",
+      [username],
+    );
+
+    if (userResult.rows.length > 0) {
+      return res
+        .status(400)
+        .json({ status: "Username already has an account!" });
+    }
+
+    //if username doesn't exists in db, add to it
+    await client.query(
+      "INSERT INTO users (username, password) VALUES ($1, $2)",
+      [username, hashedPassword],
+    );
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ Error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+//third-party account endpoint
+//expects a req object that carries username and uid payload
+app.post("/login_third-party", async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const result = await client.query("SELECT * FROM users WHERE uid = $1", [
+      req.body.uid,
+    ]);
+    //user info
+    const user = result.rows[0];
+    // console.log(user);
+    if (user) {
+      //access token - token will have uid to be used for verification before sending requests
+      let token = jwt.sign(
+        { id: user.uid, username: user.username },
+        SECRET_KEY,
+        { expiresIn: 86400 },
+      );
+      //refresh token - will be used to access the refreshToken endpoint to generate new accessToken
+      let refreshToken = jwt.sign(
+        { id: user.uid, username: user.username },
+        REFRESH_SECRET_KEY,
+        { expiresIn: "7d" },
+      );
+      //response object
+      return res.status(200).json({ auth: true, token, refreshToken });
+    } else {
+      //access token - token will have uid to be used for verification before sending requests
+      let token = jwt.sign(
+        { id: req.body.uid, username: req.body.username },
+        SECRET_KEY,
+        { expiresIn: 86400 },
+      );
+      //refresh token - will be used to access the refreshToken endpoint to generate new accessToken
+      let refreshToken = jwt.sign(
+        { id: req.body.uid, username: req.body.username },
+        REFRESH_SECRET_KEY,
+        { expiresIn: "7d" },
+      );
+      const query = "INSERT INTO users (username, uid) VALUES  ($1, $2)";
+      await client.query(query, [req.body.username, req.body.uid]);
+      //response object
+      res.status(201).json({ auth: true, token, refreshToken });
+    }
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ auth: false, Error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+//login endpoint
+app.post("/login", async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      "SELECT * FROM users WHERE username = $1",
+      [req.body.username],
+    );
+    //user info
+    const user = result.rows[0];
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Username or password incorrect" });
+    }
+
+    const passwordIsValid = await bcrypt.compare(
+      req.body.password,
+      user.password,
+    );
+    if (!passwordIsValid) {
+      //response object will be json of 'auth', 'token'
+      return res
+        .status(401)
+        .json({ auth: false, token: null, refreshToken: null });
+    }
+    //access token - store user id, username into the generated JWT token
+    let token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, {
+      expiresIn: 86400,
+    });
+    //refresh token
+    let refreshToken = jwt.sign(
+      { id: user.id, username: user.username },
+      REFRESH_SECRET_KEY,
+      { expiresIn: "7d" },
+    );
+
+    // //send cookies as a response
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    //   secure: false,
+    // });
+    res
+      .status(200)
+      //success response object
+      .json({ auth: true, token: token, refreshToken: refreshToken });
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ Error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+app.post("/refresh_token", async (req, res) => {
+  const client = await pool.connect();
+
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(401).json({ message: "No token provided." });
+  }
+
+  try {
+    // Verify the refresh token
+    const decoded = jwt.verify(refreshToken, REFRESH_SECRET_KEY);
+
+    const { id } = decoded;
+
+    // Query the database to validate the user exists
+    //uid is of type varchar(150)
+    //id is of type integer
+
+    const result =
+      typeof id !== "string"
+        ? await client.query("SELECT * FROM users WHERE id = $1", [id])
+        : await client.query("SELECT * FROM users WHERE uid = $1", [id]);
+
+    const user = result.rows[0]; // Assuming your client.query returns an object with a rows array
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Generate a new access token
+    const newAccessToken = jwt.sign(
+      { id: user.uid || user.id, username: user.username },
+      SECRET_KEY,
+      { expiresIn: 86400 }, // 86400 seconds expressed as a string
+    );
+
+    return res.json({ auth: true, token: newAccessToken });
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(403).json({ auth: false, message: "Token expired." });
+    } else if (err.name === "JsonWebTokenError") {
+      return res.status(403).json({ auth: false, message: "Invalid token." });
+    } else {
+      // Generic error response for any other errors
+      return res.status(500).json({ message: "Internal server error." });
+    }
+  }
+});
+
+//get all reservation based on user id(token) to be displayed onto the list
+app.post("/reservation/user", async (req, res) => {
+  //req body should expect a jwt token which we will use to access the id/uid
+  const client = await pool.connect();
+  const { token } = req.body;
+  if (!token) {
+    return res.status(401).json({ error: "access denied" });
+  }
+  try {
+    //verify token
+    const verified = jwt.verify(token, SECRET_KEY);
+    //extract out id from token
+    const { id } = verified;
+    //fetch user data from database
+
+    const user =
+      typeof id !== "string"
+        ? await client.query("SELECT * FROM users WHERE id = $1", [id])
+        : await client.query("SELECT * FROM users WHERE uid = $1", [id]);
+
+    if (user) {
+      //fetch reservation data from database
+      const queryId =
+        "SELECT * FROM reservations WHERE user_id = $1 AND showreservation = true";
+      const queryUid =
+        "SELECT * FROM reservations WHERE user_uid = $1 AND showreservation = true";
+      const result =
+        typeof id !== "string"
+          ? await client.query(queryId, [id])
+          : await client.query(queryUid, [id]);
+      console.log(result.rows);
+      return res.status(200).json(result.rows);
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+//accessing username via jwt token
+app.get("/username", (req, res) => {
+  //check if auth bearer token exists
+  const authToken = req.headers.authorization;
+
+  if (!authToken) {
+    return res.status(401).json({ error: "access denied" });
+  }
+
+  try {
+    //verify token (decode)
+    const verified = jwt.verify(authToken, SECRET_KEY);
+    res.json({
+      username: verified.username,
+    });
+  } catch (error) {
+    res.status(400).json({ error: "Invalid token" });
+  }
+});
+
+//creates a reservation
+app.post("/reservation", async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const data = {
+      userId: req.body.userId,
+      listingId: req.body.listingId,
+      guestname: req.body.guestname,
+      guestemail: req.body.guestemail,
+      checkindate: req.body.checkindate,
+      checkoutdate: req.body.checkoutdate,
+      //token to verify user
+      token: req.body.token,
+    };
+
+    if (!data.token) {
+      return res.status(400).json({ message: "Access denied" });
+    }
+
+    const verified = jwt.verify(data.token, SECRET_KEY);
+
+    if (!verified) {
+      return res.status(400).json({ message: "Access denied" });
+    }
+
+    const queryId =
+      "INSERT INTO reservations (user_id, listing_id, guestname, guestemail, checkindate, checkoutdate) VALUES ($1, $2, $3, $4, $5, $6)";
+    const queryUid =
+      "INSERT INTO reservations (user_uid, listing_id, guestname, guestemail, checkindate, checkoutdate) VALUES ($1, $2, $3, $4, $5, $6)";
+
+    const params = [
+      data.userId,
+      data.listingId,
+      data.guestname,
+      data.guestemail,
+      data.checkindate,
+      data.checkoutdate,
+    ];
+    // //inserts into the reservations table
+    console.log(data.userId);
+    typeof data.userId !== "string"
+      ? await client.query(queryId, params)
+      : await client.query(queryUid, params);
+    // data.id = result.rows[0].id;
+    console.log("after");
+    //updates the listings table to set isbooked = true
+    await client.query("UPDATE listings SET isbooked = $1 WHERE id = $2", [
+      true,
+      data.listingId,
+    ]);
+
+    console.log(`Reservation created successfully with id ${data.id}`);
+    res.json({
+      status: "success",
+      data: data,
+      message: "Reservation created successfully",
+    });
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+//update a reservation (more so on timing)
+
+app.put("/reservation/:id", async (req, res) => {
+  //access the id params in the url
+  const { id } = req.params;
+  const { guestname, guestemail, checkindate, checkoutdate } = req.body;
+  const client = await pool.connect();
+  try {
+    const query =
+      "UPDATE reservations SET guestname = $1, guestemail = $2, checkindate = $3, checkoutdate = $4 WHERE id = $5";
+    const queryData = [guestname, guestemail, checkindate, checkoutdate, id];
+    //send the query to the db
+    await client.query(query, queryData);
+    res.status(200).json({ Status: "Success" });
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ Error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+//deletes a reservation
+app.put("/reservation/:id/delete", async (req, res) => {
+  //access the params
+  const { id } = req.params;
+  const { reasoncancel, listing_id } = req.body;
+  const client = await pool.connect();
+  try {
+    const query =
+      "UPDATE reservations SET showreservation = $1, reasoncancel = $2 WHERE id = $3 ";
+    //updates the reservations table; set showreservation to false
+    console.log("reservation");
+    await client.query(query, [false, reasoncancel, id]);
+    //updates the listings table; sets isbooked to false
+    console.log("after reservation");
+    await client.query("UPDATE listings SET isbooked = $1 WHERE id = $2", [
+      false,
+      listing_id,
+    ]);
+    console.log("after listings");
+    res.status(200).json({
+      status: "reservation removed and listings is open for booking again",
+    });
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+//gets a reservation based on id
+app.get("/reservation/:id", async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+  try {
+    const query = "SELECT * FROM reservations WHERE id = $1";
+    const result = await client.query(query, [id]);
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+//gets a post based on author name
+//date format YYYY/MM/DD
+app.get("/reservations/dates/:startDate/:endDate", async (req, res) => {
+  //extract dates out
+  const { startDate, endDate } = req.params;
+  const client = await pool.connect();
+  try {
+    const query =
+      "SELECT * FROM reservations WHERE CAST(created_at AS DATE) BETWEEN $1 AND $2";
+    const queryData = [startDate, endDate];
+    const response = await client.query(query, queryData);
+    res.status(200).json(response.rows);
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+//gets all the reservation
+app.get("/reservations", async (req, res) => {
+  //establish connection
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      "SELECT * FROM reservations WHERE showreservation = $1",
+      [true],
+    );
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).send("An error occured");
+  } finally {
+    client.release();
+  }
+});
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+//listing endpoints
+
+//get all listings to be rendered onto page
+app.get("/listings", async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const result = await client.query("SELECT * FROM listings");
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).send("An error occured");
+  } finally {
+    client.release();
+  }
+});
+
+//get a single listing for listing detail page
+app.get("/listing/:id", async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { id } = req.params;
+    const query = "SELECT * FROM listings WHERE id = $1";
+    const result = await client.query(query, [id]);
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).send("An error occured");
+  } finally {
+    client.release();
+  }
+});
+
+//open index.html on default path
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname + "/index.html"));
+});
+
+//catch-all endpoint for 404
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname + "/404.html"));
+});
+
+//starts the web-server on port 3000, validate success via console.log
+app.listen(3000, () => {
+  console.log("App is listening on port 3000");
+});

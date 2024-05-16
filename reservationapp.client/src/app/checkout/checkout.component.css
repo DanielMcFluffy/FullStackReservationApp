@@ -1,0 +1,45 @@
+.btn-transparent:hover {
+  background-color: gainsboro;
+}
+
+.booking-date + .btn-transparent {
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.btn + span {
+  margin-left: 2rem;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.detail-title,
+.price-details-title,
+.total-price,
+.col-7 > span.lead {
+  font-size: large;
+  font-weight: 500;
+}
+
+p.text-center.text-muted {
+  font-size: small;
+}
+
+.left {
+  text-decoration: underline;
+}
+
+.summary {
+  margin-left: 5%;
+  text-wrap: nowrap;
+}
+@media (min-width: 768px) {
+  .summary {
+    text-wrap: wrap;
+  }
+}
+
+img {
+  object-fit: cover;
+  overflow: hidden;
+}

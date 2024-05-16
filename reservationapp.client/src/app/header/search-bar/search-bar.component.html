@@ -1,0 +1,22 @@
+@if (!disableSearch) {
+
+<div class="container">
+  <form (ngSubmit)="onSearch()">
+    <div class="input-group">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        name="search"
+      />
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+}

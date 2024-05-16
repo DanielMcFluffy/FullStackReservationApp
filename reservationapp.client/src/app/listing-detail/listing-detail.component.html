@@ -1,0 +1,272 @@
+<div class="mt-2 detail-page">
+  @if (!listing) {
+  <h3>Loading ...</h3>
+  }
+  <div class="row">
+    <div class="col-xs-12 m-2">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <p class="title">
+            {{ listing.title }}
+          </p>
+        </div>
+        <div>
+          <button class="btn btn-transparent">
+            <i class="bi bi-upload"></i> share
+          </button>
+          <button class="btn btn-transparent">
+            <i class="bi bi-heart"></i> save
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xs-12 image-col">
+      <div class="image-container">
+        <div class="listing-image1">
+          <img
+            src="{{ listing.image1 }}"
+            alt="First image"
+            (click)="openImageModal(listing)"
+          />
+        </div>
+        <div>
+          <img
+            src="{{ listing.image2 }}"
+            alt="Second image"
+            class=""
+            (click)="openImageModal(listing)"
+          />
+        </div>
+        <div>
+          <img
+            src="{{ listing.image3 }}"
+            alt="Third image"
+            class=""
+            (click)="openImageModal(listing)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-container">
+      <div class="detail-description">
+        <h4>{{ listing.description }}</h4>
+        <p class="text-muted">
+          {{ listing.guests }} guests &#8226; {{ listing.bedroom }} bedroom
+          &#8226; {{ listing.beds }} beds &#8226;
+          {{ listing.bathroom }} bathroom
+        </p>
+        <div class="horizontal1">
+          <hr />
+        </div>
+      </div>
+
+      <div class="detail-facility">
+        <hr class="hr-responsive" />
+        <h4 class="my-4">Peace of mind</h4>
+        <div class="facility-container">
+          <div class="facility-icon1">
+            <i class="bi bi-door-open"></i>
+          </div>
+
+          <div class="facility-description mx-2 mt-2">
+            <p class="facility-main">Self check-in</p>
+            <p class="text-muted">Check yourself in with the lockbox.</p>
+          </div>
+
+          <div class="facility-icon2">
+            <i class="bi bi-calendar2-x"></i>
+          </div>
+
+          <div class="facility-description mx-2">
+            <p class="facility-main">Free cancellation a week before</p>
+            <p class="text-muted">Full refund if you changed your mind.</p>
+          </div>
+          <!-- horizontal line for separation -->
+          <div class="horizontal">
+            <hr />
+          </div>
+
+          <div class="facility-extras">
+            <h4>What this place offers</h4>
+
+            <div class="extras-container mt-4 hstack gap-4">
+              <div
+                [ngClass]="{ unavailable: !facility_kitchen }"
+                class="extras-kitchen"
+              >
+                <i class="bi bi-cup-hot"></i> <span>kitchen</span>
+              </div>
+              <div
+                [ngClass]="{ unavailable: !facility_laundry }"
+                class="extras-laundry"
+              >
+                <i class="bi bi-droplet"></i> <span>laundry</span>
+              </div>
+              <div
+                [ngClass]="{ unavailable: !facility_pool }"
+                class="extras-pool"
+              >
+                <i class="bi bi-emoji-sunglasses"></i> <span>pool</span>
+              </div>
+              <div
+                [ngClass]="{ unavailable: !facility_gym }"
+                class="extras-gym"
+              >
+                <i class="bi bi-brilliance"></i> <span>yoga room</span>
+              </div>
+              <div
+                [ngClass]="{ unavailable: !facility_security }"
+                class="extras-security"
+              >
+                <i class="bi bi-lock"></i> <span>24/7 security</span>
+              </div>
+              <div
+                [ngClass]="{ unavailable: !facility_parking }"
+                class="extras-parking"
+              >
+                <i class="bi bi-car-front"></i> <span>free parking</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- mobile pricing detail section -->
+      <div class="detail-price-mobile">
+        <div
+          class="container detail-price-container-mobile border rounded-4 shadow"
+        >
+          <div class="row mt-3">
+            @if (listing.price) {
+
+            <p class="d-flex justify-content-between">
+              <span style="font-size: 26px; font-weight: 550"
+                >RM{{ listing.price }}
+                <span style="font-size: 1.3rem; font-weight: 400"
+                  >{{ " " }} night
+                </span>
+              </span>
+              <button
+                class="btn btn-secondary align-items-center"
+                (click)="openCalendarDialog()"
+              >
+                <p style="margin-bottom: 0px" class="d-inline-block">
+                  Pick Date {{ " " }}
+                  <i class="ms-3 bi bi-calendar-event"></i>
+                </p>
+              </button>
+            </p>
+            } @else {
+            <p class="text-center">Loading...</p>
+            }
+          </div>
+          <div class="row"></div>
+
+          <hr style="margin-top: 0px" />
+
+          <div class="row d-flex justify-content-between subtotal">
+            @if ( listing.price && bookingDaysTracked !== undefined &&
+            bookingDaysTracked>0 ) {
+            <div class="w-auto left">RM{{ listing!.price }}</div>
+            <div class="w-auto">
+              RM{{ listing!.price * bookingDaysTracked }}
+            </div>
+            } @else {
+            <div class="text-center">Loading ...</div>
+            }
+          </div>
+
+          <div class="row d-flex justify-content-between subtotal">
+            <div class="w-auto left">Cleaning Fee</div>
+            <div class="w-auto">RM60</div>
+          </div>
+
+          <hr />
+
+          <div class="row d-flex justify-content-between subtotal">
+            @if ( listing.price && bookingDaysTracked !== undefined &&
+            bookingDaysTracked>0 ) {
+            <div class="fw-bold text-center">
+              Total including taxes RM{{
+                listing!.price * bookingDaysTracked + 60
+              }}
+            </div>
+            } @else {
+            <div class="text-center">Loading...</div>
+            }
+          </div>
+
+          <div class="row">
+            <button (click)="onAddToCart()" class="mt-3 p2 btn btn-primary">
+              Reserve
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- desktop pricing detail section -->
+      <div class="detail-price">
+        <div class="container detail-price-container border rounded-4 shadow">
+          <div class="row ms-2">
+            <div class="row mt-4">
+              @if (listing.price) {
+              <p>
+                <span style="font-size: 26px; font-weight: 550"
+                  >RM{{ listing.price }}</span
+                >
+                {{ " " }} night
+              </p>
+              } @else {
+              <p>Loading...</p>
+              }
+            </div>
+            <div class="row">
+              <app-calendar
+                (sendBookingDaysTracked)="receiveBookingDaysTracked($event)"
+                (sendBookingDates)="receiveBookingDates($event)"
+              ></app-calendar>
+              <button (click)="onAddToCart()" class="mt-3 p-2 btn btn-primary">
+                Reserve
+              </button>
+              <p class="text-muted mt-3 text-center">
+                You won't be charged yet
+              </p>
+            </div>
+            <div class="row days-fees mb-2">
+              @if ( listing.price && bookingDaysTracked !== undefined &&
+              bookingDaysTracked>0 ) {
+              <div class="col-auto mr-auto">
+                <span
+                  >RM{{ listing.price }} x {{ bookingDaysTracked }} days</span
+                >
+              </div>
+              <div class="col-auto">
+                RM{{ listing!.price * bookingDaysTracked }}
+              </div>
+              } @else {
+              <div class="text-center">Loading...</div>
+              }
+            </div>
+            <div class="row cleaning-fees mb-4">
+              <div class="col-auto mr-auto"><span>Cleaning fee</span></div>
+              <div class="col-auto">RM60</div>
+            </div>
+            <hr />
+            <div class="row total-fees mb-4">
+              @if ( listing.price && bookingDaysTracked !== undefined &&
+              bookingDaysTracked>0 ) {
+              <div class="text-center fw-bold">
+                Total including taxes RM{{
+                  listing!.price * bookingDaysTracked + 60
+                }}
+              </div>
+              } @else {
+              <div class="text-center">Loading...</div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

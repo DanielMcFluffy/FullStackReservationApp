@@ -9,7 +9,7 @@ namespace ReservationApp.Server.Models
         [BsonRepresentation(BsonType.ObjectId)] //converts the parameter type from ObjectId to string
 
         // properties with * will need be passed their values somehow from the front-end (state management?)
-        public string id { get; set; } = null!; //* passed to the reservation collection
+        public string? id { get; set; } = null!; //* passed to the reservation collection
         public string? title { get; set; } = null!;
         public long price { get; set; }
         public string description { get; set; } = null!;

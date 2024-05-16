@@ -1,0 +1,19 @@
+
+
+  <div class="card" >
+    <div class="card-body my-2">
+      <img
+      class="card-img-top mb-2"
+      src={{listing!.image1}}
+      
+      >
+      <h5 class="card-title mb-2">{{listing!.title}}</h5>
+      <p>
+        <small class="form-text" >{{listing.distance}} km kilometers away</small>
+      </p>
+      <h6 class="card-subtitle mb-2 text-muted ">{{listing!.price | currency:'RM':'symbol':'1.0-0'}} {{'night'}}</h6>
+      <p class="card-text">{{listing!.description}}</p>
+    </div>
+  </div>
+
+

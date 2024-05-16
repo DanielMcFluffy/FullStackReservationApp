@@ -1,0 +1,9 @@
+.card {
+  border-style: none;
+}
+
+.card-body img {
+  height: 260px;
+  min-width: 274px;
+  border-radius: 5%;
+}

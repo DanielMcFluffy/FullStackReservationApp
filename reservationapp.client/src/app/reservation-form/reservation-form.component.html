@@ -1,0 +1,85 @@
+<app-home></app-home>
+
+<h2 class="mt-5 mb-3">Reservation Overview</h2>
+<form [formGroup]="reservationForm" (submit)="onSubmit()">
+  <div class="row mb-3">
+    <div class="col">
+      <label class="form-label">Check-In Date:</label>
+      <input
+        class="form-control"
+        type="date"
+        formControlName="checkindate"
+        [min]="today"
+      />
+      <!-- render the form validation message -->
+      <small
+        class="text-danger"
+        *ngIf="
+          reservationForm.get('checkindate')?.invalid &&
+          reservationForm.get('checkindate')?.touched
+        "
+      >
+        Check-In Date is required.
+      </small>
+    </div>
+
+    <div class="col">
+      <label class="form-label">Check-Out Date:</label>
+      <input
+        class="form-control"
+        type="date"
+        formControlName="checkoutdate"
+        [min]="today"
+      />
+      <small
+        class="text-danger"
+        *ngIf="
+          reservationForm.get('checkoutdate')?.invalid &&
+          reservationForm.get('checkoutdate')?.touched
+        "
+      >
+        Check-Out Date is required.
+      </small>
+    </div>
+  </div>
+
+  <div class="mb-3"></div>
+
+  <div class="row mb-3">
+    <div class="col">
+      <label class="form-label">Reservation Name:</label>
+      <input class="form-control" type="text" formControlName="guestname" />
+      <small
+        class="text-danger"
+        *ngIf="
+          reservationForm.get('guestname')?.invalid &&
+          reservationForm.get('guestname')?.touched
+        "
+      >
+        Guest name is required.
+      </small>
+    </div>
+
+    <div class="col">
+      <label class="form-label">Guest Email:</label>
+      <input class="form-control" type="email" formControlName="guestemail" />
+      <small
+        class="text-danger"
+        *ngIf="
+          reservationForm.get('guestemail')?.invalid &&
+          reservationForm.get('guestemail')?.touched
+        "
+      >
+        Guest email is required.
+      </small>
+    </div>
+  </div>
+
+  <button
+    class="btn btn-primary my-3"
+    type="submit"
+    [disabled]="!reservationForm.dirty"
+  >
+    Submit
+  </button>
+</form>

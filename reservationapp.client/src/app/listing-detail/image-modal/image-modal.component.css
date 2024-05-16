@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center items horizontally */
+  justify-content: space-around; /* Evenly distribute space */
+  padding: 15px;
+}
+
+.row {
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px; /* Space between rows */
+}
+
+img {
+  max-width: 100%;
+  height: auto; /* Maintain aspect ratio */
+  max-height: 300px;
+  object-fit: cover;
+}

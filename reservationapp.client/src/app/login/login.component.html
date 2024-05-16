@@ -1,0 +1,89 @@
+<div
+  class="container d-flex justify-content-center mt-5"
+  style="
+    height: 80vh;
+    width: 30vw;
+    border-radius: 12px;
+    background-color: aliceblue;
+  "
+>
+  <div>
+    <div class="mt-5">
+      <h2><strong>Login</strong></h2>
+      <div *ngIf="errorMessage()" class="alert alert-danger" role="alert">
+        Incorrect credentials!
+      </div>
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <div class="col">
+          <label class="form-label">Email</label>
+          <input
+            class="form-control"
+            type="email"
+            formControlName="email"
+            placeholder="Enter email"
+          />
+          <!-- render the form validation message -->
+          <small
+            class="text-danger"
+            *ngIf="
+              loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+            "
+          >
+            Email required!
+          </small>
+        </div>
+
+        <div class="col">
+          <label class="form-label">Password</label>
+          <input
+            class="form-control"
+            type="password"
+            formControlName="password"
+            placeholder="Enter password"
+          />
+          <!-- render the form validation message -->
+          <small
+            class="text-danger"
+            *ngIf="
+              loginForm.get('password')?.invalid &&
+              loginForm.get('password')?.touched
+            "
+          >
+            Password required!
+          </small>
+        </div>
+        <div class="my-3">
+          <small
+            >Don't have an account? Register
+            <button
+              type="button"
+              (click)="openDialog()"
+              class="btn btn-secondary btn-sm"
+            >
+              here
+            </button></small
+          >
+        </div>
+        <button class="mt-4 btn btn-primary" type="submit">Login</button>
+      </form>
+    </div>
+    <div style="text-align: center" class="mt-5">Or Sign In Using</div>
+    <div class="row mt-5 justify-content-center">
+      <!-- <div class="col">
+            <a href="#">
+              <i class="bi bi-github" style="font-size: 2em"></i>
+            </a>
+          </div> -->
+      <div class="col text-center">
+        <a href="#" (click)="handleGoogleSignIn(); $event.preventDefault()">
+          <i class="bi bi-google" style="font-size: 2em"></i>
+        </a>
+      </div>
+      <!-- <div class="col">
+            <a href="#">
+              <i class="bi bi-facebook" style="font-size: 2em"></i>
+            </a>
+          </div> -->
+    </div>
+  </div>
+</div>

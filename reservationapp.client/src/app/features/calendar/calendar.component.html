@@ -1,0 +1,21 @@
+<mat-form-field class="calendar-form-field">
+  <mat-label>Booking Date</mat-label>
+  <!-- rangePicker will need to bind with the range-picker element below -->
+  <mat-date-range-input
+    [min]="tomorrow"
+    style="margin-left: 46px"
+    [formGroup]="bookingDate"
+    [rangePicker]="bookingDatePicker"
+  >
+    <input matStartDate placeholder="Start date" formControlName="start" />
+    <input matEndDate placeholder="End date" formControlName="end" />
+  </mat-date-range-input>
+  <mat-hint style="margin-left: 46px">DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+
+  <mat-datepicker-toggle
+    matIconSuffix
+    [for]="bookingDatePicker"
+  ></mat-datepicker-toggle>
+
+  <mat-date-range-picker #bookingDatePicker></mat-date-range-picker>
+</mat-form-field>

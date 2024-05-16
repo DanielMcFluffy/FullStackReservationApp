@@ -1,0 +1,26 @@
+.navbar {
+  padding-left: 80px;
+  padding-right: 80px;
+  min-width: 480px;
+  position: relative;
+}
+
+.brand-logo {
+  height: 60px;
+}
+
+p {
+  display: inline;
+}
+
+@media (max-width: 430px) {
+  .brand-logo {
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 992px) {
+  p {
+    display: none;
+  }
+}
