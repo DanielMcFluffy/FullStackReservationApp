@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 using ReservationApp.Server.Models;
 using ReservationApp.Server.Services;
 
@@ -39,6 +40,17 @@ namespace ReservationApp.Server.Controllers
 
             return CreatedAtAction(nameof(Get), new { id = newListing.id });
         }
+        //TODO: add a bulk write method -- refer to listingsService as well
+
+        ////bulk write 
+        //[HttpPost]
+
+        //public async Task<IActionResult> Post(List<Listing> listings)
+        //{
+        //    await _listingsService.CreateBulkAsync(listings);
+
+        //    return NoContent();
+        //}
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, Listing updatedListing)

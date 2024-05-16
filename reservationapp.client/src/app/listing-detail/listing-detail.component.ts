@@ -75,11 +75,6 @@ export class ListingDetailComponent implements OnInit {
       this.facility_security = facility_security;
     });
   }
-
-  openCalendarDialog() {
-    //open a new instance of the calendar component (separate from the one in listing-detail)
-    const dialogRef = this.dialog.open(CalendarComponent, {});
-
     //TODO: migrate this logic to the calendar component as below bug fix attempt doesn't work.
     // REPLICATE ERROR: Check console log while opening and closing the (mobile-view) calendar component
 
@@ -92,11 +87,16 @@ export class ListingDetailComponent implements OnInit {
     // dialogRef.componentInstance.tomorrow.setDate(checkInDate.getDate() - 1);
     // dialogRef.componentInstance.endDate.setDate(checkOutDate.getDate());
     ///////////////////////////////////////////////////////////////
+    //open a new instance of the calendar component (separate from the one in listing-detail)
+
+  openCalendarDialog() {
+
+    const dialogRef = this.dialog.open(CalendarComponent, {});
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.receiveBookingDaysTracked(result);
-        console.log(result);
+        //console.log(result);
       }
     });
 

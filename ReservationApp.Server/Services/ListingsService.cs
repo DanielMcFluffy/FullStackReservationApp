@@ -24,6 +24,13 @@ namespace ReservationApp.Server.Services
             await _listingCollection.Find(x => x.id == id).FirstOrDefaultAsync();
         public async Task CreateAsync(Listing newListing) =>
             await _listingCollection.InsertOneAsync(newListing);
+        //TODO: add a bulk write method -- refer to listingsController as well
+
+        //public async Task CreateBulkAsync(List<Listing> listings)
+        //{
+        //    await _listingCollection.InsertManyAsync(listings);
+        //}
+
         public async Task UpdateAsync(string id, Listing updatedListing) =>
             await _listingCollection.ReplaceOneAsync(x => x.id == id, updatedListing);
         public async Task RemoveAsync(string id) =>

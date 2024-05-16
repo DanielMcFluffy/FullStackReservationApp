@@ -45,7 +45,7 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   //   return this.listingsService.getListing(listingId);
   // }
 
-  checkGetListing$(listingId: number) {
+  checkGetListing$(listingId: string) {
     console.log(listingId);
     this.listingsService
       .getListing(listingId)

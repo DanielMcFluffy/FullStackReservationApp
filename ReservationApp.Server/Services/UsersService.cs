@@ -20,8 +20,11 @@ namespace ReservationApp.Server.Services
 
         public async Task<List<User>> GetAsync() =>
             await _userCollection.Find(_ => true).ToListAsync();
-        public async Task<User?> GetAsync(string id) =>
+        public async Task<User?> GetByIdAsync(string id) =>
             await _userCollection.Find(x => x.id == id).FirstOrDefaultAsync();
+
+        public async Task<User?> GetByUsernameAsync(string username) =>
+            await _userCollection.Find(x => x.username == username).FirstOrDefaultAsync();
         public async Task CreateAsync(User newUser) =>
             await _userCollection.InsertOneAsync(newUser);
         //public async Task UpdateAsync(string id, Listing updatedUser) =>

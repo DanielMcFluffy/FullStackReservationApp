@@ -6,6 +6,17 @@ using ReservationApp.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader();
+
+        });
+});
+
 // Add services to the container.
 
 //adds the appsetings.json as a service so we can inject it into the ReservationDatabaseSettings class
@@ -48,6 +59,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 app.UseAuthorization();
 
