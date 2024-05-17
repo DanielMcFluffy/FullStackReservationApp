@@ -10,7 +10,7 @@ export class ReservationService {
   private reservations: Reservation[] = [];
   //specify api url
   private apiUrl =
-    'https://743ef722-2574-4ca1-88f3-63238a52902c-00-24dm5qezjjxqk.pike.replit.dev';
+    'https://localhost:7066';
 
   //inject the http entity to be used in methods
   constructor(private http: HttpClient) {}
@@ -27,7 +27,7 @@ export class ReservationService {
 
   //get singular reservation
   getReservation(id: string): Observable<Reservation> {
-    return this.http.get<Reservation>(this.apiUrl + '/reservation/' + id);
+    return this.http.get<Reservation>(this.apiUrl + '/reservations/' + id);
   }
 
   //get reservations based on username provided from token
@@ -35,21 +35,21 @@ export class ReservationService {
   getUserReservation(token: string | null): Observable<Reservation[]> {
     //endpoint expects a json request object with key 'token'
 
-    return this.http.post<Reservation[]>(this.apiUrl + '/reservation/user', {
+    return this.http.post<Reservation[]>(this.apiUrl + '/reservations/user', {
       token,
     });
   }
 
   addReservation(reservation: Reservation): Observable<void> {
-    return this.http.post<void>(this.apiUrl + '/reservation', reservation);
+    return this.http.post<void>(this.apiUrl + '/reservations', reservation);
   }
 
   deleteReservation(
-    id: number | undefined,
-    listing_id: number,
+    id: string | undefined,
+    listing_id: string,
     reasoncancel: string
   ): Observable<void> {
-    return this.http.put<void>(this.apiUrl + '/reservation/' + id + '/delete', {
+    return this.http.put<void>(this.apiUrl + '/reservations/' + id + '/delete', {
       listing_id,
       reasoncancel,
     });
@@ -60,7 +60,7 @@ export class ReservationService {
     updatedReservation: Reservation
   ): Observable<void> {
     return this.http.put<void>(
-      this.apiUrl + '/reservation/' + id,
+      this.apiUrl + '/reservations/' + id,
       updatedReservation
     );
   }

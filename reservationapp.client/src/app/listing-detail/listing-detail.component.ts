@@ -26,7 +26,7 @@ export class ListingDetailComponent implements OnInit {
 
   listing!: Listings;
 
-  listingId!: number;
+  listingId!: string;
 
   facility_gym?: boolean;
   facility_kitchen?: boolean;

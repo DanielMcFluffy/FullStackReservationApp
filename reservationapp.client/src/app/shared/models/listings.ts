@@ -1,6 +1,6 @@
 export interface Listings {
   
-    id: number,
+    id: string,
     title: string,
     price: number,
     description: "A cozy place to live in",

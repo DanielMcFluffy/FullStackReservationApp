@@ -14,7 +14,7 @@ export class DeletePopupComponent {
     private router: Router,
     private reservationsService: ReservationService,
     public dialogRef: MatDialogRef<DeletePopupComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { id: number; listing_id: number }
+    @Inject(MAT_DIALOG_DATA) public data: { id: string; listing_id: string }
   ) {}
 
   //properties needed to pass into the onSubmit method which will trigger the deletereservation method from reservationService

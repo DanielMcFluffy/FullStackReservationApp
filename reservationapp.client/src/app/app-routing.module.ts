@@ -20,7 +20,8 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {
     path: 'list',
-    canActivate: [activateGuard],
+    //FOR DEVELOPMENT PURPOSES
+    // canActivate: [activateGuard],
     component: ReservationListComponent,
     children: [{ path: ':username', component: ReservationListComponent }],
   },

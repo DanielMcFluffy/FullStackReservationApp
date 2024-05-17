@@ -1,10 +1,9 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Reservation } from '../shared/models/reservation';
 import { ReservationService } from '../reservation/reservation.service';
 import { AccountsService } from '../shared/accounts.service';
 import { Listings } from '../shared/models/listings';
 import { ListingsService } from '../landing/listings.service';
-import { Observable, forkJoin } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DeletePopupComponent } from './delete-popup/delete-popup.component';
 
@@ -17,7 +16,7 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   reservations: Reservation[] = [];
   isLoading: boolean = true; // Track loading state
   listing!: Listings;
-  token = this.accountsService.getToken();
+  token = this.accountsService.getToken(); //extract token from local storage
 
   constructor(
     private reservationService: ReservationService,
@@ -27,15 +26,26 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if (this.token) {
-      this.reservationService
-        .getUserReservation(this.token)
-        .subscribe((userReservations: Reservation[]) => {
-          this.reservations = userReservations;
-          console.log(this.reservations);
-          this.isLoading = false;
-        });
-    }
+    ////////////////////////////////////////////
+    //FOR DEVELOPMENT PURPOSES
+    // if (this.token) {
+      // this.reservationService
+      //   .getUserReservation(this.token)
+      //   .subscribe((userReservations: Reservation[]) => {
+      //     this.reservations = userReservations;
+      //     console.log(this.reservations);
+      //     this.isLoading = false;
+      //   });
+    // }
+
+    this.reservationService.getReservations()
+      .subscribe(reservations => {
+        this.reservations = reservations;
+        console.log(this.reservations);
+        this.isLoading = false;
+      })
+    ////////////////////////////////////////////
+
   }
 
   ngOnDestroy(): void {}
@@ -45,12 +55,13 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   //   return this.listingsService.getListing(listingId);
   // }
 
-  checkGetListing$(listingId: string) {
-    console.log(listingId);
-    this.listingsService
-      .getListing(listingId)
-      .subscribe((data) => console.log(typeof data));
-  }
+  //for debugging
+  // checkGetListing$(listingId: string) {
+  //   console.log(listingId);
+  //   this.listingsService
+  //     .getListing(listingId)
+  //     .subscribe((data) => console.log(typeof data));
+  // }
 
   //we add a data property into the dialog config to store the data in that instance of the delete modal dialog--which will then be accessed by the dialogRef type in the delete-popup (child) component
   onDelete(reservation: Reservation) {

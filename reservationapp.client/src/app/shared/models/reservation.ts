@@ -1,11 +1,11 @@
 export interface Reservation {
-  id?: number;
-  checkindate: Date;
-  checkoutdate: Date;
+  id?: string;
+  listing_id: string;
   guestname?: string;
   guestemail?: string;
-  listing_id: number;
-  userId?: string | number;
+  checkindate: Date;
+  checkoutdate: Date;
+  userId?: string;
   reasonCancel?: string;
   token?: string | number;
   listingDetails?: any;

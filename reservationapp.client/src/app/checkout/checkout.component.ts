@@ -33,11 +33,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   //checkout status
   status!: string;
+/////////////////////////////////////////////////////////////
+    //FOR DEVELOPMENT PURPOSES
 
   //username(email) and id/uid from token
   token!: string | null;
   username!: string;
   userId!: string | number;
+/////////////////////////////////////////////////////////////
 
   //days of reservation
   bookedDays!: number;
@@ -78,6 +81,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         (checkOutDate.valueOf() - checkInDate.valueOf()) / (1000 * 60 * 60 * 24)
       );
     });
+/////////////////////////////////////////////////////////////
+    //FOR DEVELOPMENT PURPOSES
 
     //extract out user info from the token
     this.token = this.accountsService.getToken();
@@ -90,6 +95,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.userId = id;
     }
   }
+/////////////////////////////////////////////////////////////
 
   ngOnDestroy(): void {
     this.bookingDaysSubscription?.unsubscribe();
@@ -100,15 +106,19 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     console.log(this.reservationDetails, this.listingDetails, this.status);
     console.log(this.reservationName.value);
     console.log(this.reservationEmail.value);
-
-    if (this.reservationDetails && this.token && this.reservationName.dirty) {
+/////////////////////////////////////////////////////////////
+    //FOR DEVELOPMENT PURPOSES
+    // if (this.reservationDetails && this.token && this.reservationName.dirty) {
+      
+      if (this.reservationDetails && this.reservationName.dirty) {
       this.reservationService
         .addReservation({
           ...this.reservationDetails,
           guestname: this.reservationName.value,
           guestemail: this.reservationEmail.value,
-          userId: this.userId,
-          token: this.token,
+          // userId: this.userId,
+          userId: 'test', 
+          // token: this.token,
           listing_id: this.listingDetails!.id,
         })
         .subscribe(
@@ -128,6 +138,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.errorLoginMessage = true;
     }
   }
+
+/////////////////////////////////////////////////////////////
+
 
   editDate() {
     const dialogRef = this.dialog.open(CalendarComponent, {

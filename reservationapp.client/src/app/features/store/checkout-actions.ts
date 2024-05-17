@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store';
 import { Reservation } from '../../shared/models/reservation';
 
 export interface payloadListing {
-  id: number;
+  id: string;
   title: string;
   price: number;
   description: string;
