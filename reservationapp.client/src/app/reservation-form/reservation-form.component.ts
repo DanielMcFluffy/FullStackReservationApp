@@ -28,15 +28,22 @@ export class ReservationFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.token) {
-      const username =
-        jwtDecode<{ username: string }>(this.token).username ||
-        jwtDecode<{ email: string }>(this.token).email;
+    //////////////////////////////////
+    //FOR DEVELOPMENT PURPOSES
+    // if (this.token) {
+    //   const username =
+    //     jwtDecode<{ username: string }>(this.token).username ||
+    //     jwtDecode<{ email: string }>(this.token).email;
 
-      this.userEmail = username;
-      // console.l
-    }
+    //   this.userEmail = username;
+      
+    // }
+    //////////////////////////////////
 
+
+/////////////////////////////////////////////////////////////////////
+    //below initialization can be refactored or modified, it's legacy code from startng to learn angular
+    
     const currentDate = new Date();
     this.today = currentDate.toISOString().split('T')[0];
 
@@ -75,7 +82,7 @@ export class ReservationFormComponent implements OnInit {
     }
   }
   //use formBuilder to arrange the formControlName data we've defined in the view template in the class component
-
+/////////////////////////////////////////////////////////////////////
   onSubmit() {
     if (this.reservationForm.valid) {
       //call the reservationForm and access its value
@@ -92,14 +99,15 @@ export class ReservationFormComponent implements OnInit {
             //programmatically redirect user using the .router.navigate method
             this.router.navigate(['/list']);
           });
-      } else {
-        //add if it doesn't exist
-        this.reservationService.addReservation(reservation).subscribe(() => {
-          console.log('add request processed');
-          //programmatically redirect user using the .router.navigate method
-          this.router.navigate(['/list']);
-        });
       }
+      //  else {
+      //   //add if it doesn't exist
+      //   this.reservationService.addReservation(reservation).subscribe(() => {
+      //     console.log('add request processed');
+      //     //programmatically redirect user using the .router.navigate method
+      //     this.router.navigate(['/list']);
+      //   });
+      // }
     }
   }
 }

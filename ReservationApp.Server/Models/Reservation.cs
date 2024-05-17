@@ -3,6 +3,15 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ReservationApp.Server.Models
 {
+    public class payloadListing //this only carries the necessary information about the listing
+    {
+        public string id { get; set; } = null!;
+        public string title { get; set; } = null!;
+        public long price { get; set; } 
+        public string description { get; set; } = null!;
+        public string image1 { get; set; } = null!; 
+    }
+
     public class Reservation
     {
         [BsonId] //this defines the Id -- it will make it a primary key
@@ -18,6 +27,7 @@ namespace ReservationApp.Server.Models
         public string checkoutdate { get; set; } = null!;
         public bool showreservation { get; set; } = true;
         public string? reasoncancel { get; set; }
+        public payloadListing? listingDetails { get; set; } 
 
     }
 }

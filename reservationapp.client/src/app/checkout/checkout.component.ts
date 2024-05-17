@@ -85,17 +85,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     //FOR DEVELOPMENT PURPOSES
 
     //extract out user info from the token
-    this.token = this.accountsService.getToken();
-    if (this.token) {
-      const { username, id } = jwtDecode<{
-        username: string;
-        id: string | number;
-      }>(this.token);
-      this.username = username;
-      this.userId = id;
-    }
+    // this.token = this.accountsService.getToken();
+    // if (this.token) {
+    //   const { username, id } = jwtDecode<{
+    //     username: string;
+    //     id: string | number;
+    //   }>(this.token);
+    //   this.username = username;
+    //   this.userId = id;
+    // }
+    /////////////////////////////////////////////////////////////
   }
-/////////////////////////////////////////////////////////////
 
   ngOnDestroy(): void {
     this.bookingDaysSubscription?.unsubscribe();
@@ -120,6 +120,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           userId: 'test', 
           // token: this.token,
           listing_id: this.listingDetails!.id,
+          listingDetails: this.listingDetails
         })
         .subscribe(
           () => this.router.navigate(['/list']),

@@ -12,7 +12,8 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins("http://localhost:4200")
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .WithMethods("POST", "GET", "PUT", "DELETE"); // as of writing this, only POST and GET were the allowed methods by the cors' default policy -- setting this is necessary
 
         });
 });

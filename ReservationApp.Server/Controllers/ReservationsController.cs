@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using ReservationApp.Server.Models;
+using ReservationApp.Server.Requests;
 using ReservationApp.Server.Services;
 
 namespace ReservationApp.Server.Controllers
 {
     [ApiController]
-    [Route("reservations")]
+    [Route("reservations/")]
     public class ReservationsController : ControllerBase
     {
         private readonly ReservationsService _reservationsService;
@@ -48,7 +49,7 @@ namespace ReservationApp.Server.Controllers
             if (listing.isbooked == true)
             {
                 var errorMessage = new { Message = "Listing has been previouly booked!" };
-                return NotFound();
+                return NotFound(errorMessage);
             }
 
             listing.isbooked = true; // set the listing booking status to true
@@ -77,11 +78,11 @@ namespace ReservationApp.Server.Controllers
         }
 
         [HttpPut("{id}/delete")]
-        public async Task<IActionResult> DeleteWithReason(string id, string listing_id, string reasoncancel)
+        public async Task<IActionResult> DeleteWithReason( string id, [FromBody] DeleteWithReasonRequest request)
         {
             //we get the reservation and its listing to be updated
             var reservation = await _reservationsService.GetAsync(id);
-            var listing = await _listingsService.GetAsync(listing_id);
+            var listing = await _listingsService.GetAsync(request.listing_id);
             if (reservation == null || listing == null)
             {
                 return NotFound();
@@ -89,12 +90,12 @@ namespace ReservationApp.Server.Controllers
 
             //update it
             reservation.showreservation = false;
-            reservation.reasoncancel = reasoncancel;
+            reservation.reasoncancel = request.reasoncancel;
             listing.isbooked = false;
             
             //pass it in after update
             await _reservationsService.UpdateAsync(id, reservation);
-            await _listingsService.UpdateAsync(listing_id, listing);
+            await _listingsService.UpdateAsync(request.listing_id, listing);
 
             return NoContent();
         }

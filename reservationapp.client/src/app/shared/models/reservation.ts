@@ -8,5 +8,5 @@ export interface Reservation {
   userId?: string;
   reasonCancel?: string;
   token?: string | number;
-  listingDetails?: any;
+  listingDetails?: any; //this should contain details about listing such as img url, etc
 }

@@ -32,7 +32,8 @@ const routes: Routes = [
   },
   {
     path: 'edit/:id',
-    canActivate: [activateGuard],
+    //FOR DEVELOPMENT PURPOSES
+    // canActivate: [activateGuard],
     component: ReservationFormComponent,
   },
   { path: '404NotFound', component: ErrorPageComponent },
