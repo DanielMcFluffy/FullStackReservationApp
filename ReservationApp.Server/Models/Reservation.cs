@@ -10,11 +10,10 @@ namespace ReservationApp.Server.Models
 
         // properties with * will need be passed their values somehow from the front-end (state management?)
         public string? id { get; set; } = null!;
-        public int listing_id { get; set; } //* will receive from the listings collection
-        public string reservationname { get; set; } = null!;
+        public string listing_id { get; set; } = null!; //* will receive from the listings collection
+        public string guestname { get; set; } = null!;
         public string guestemail { get; set; } = null!; //* will receive from the users collection
-        public int? user_id { get; set; } //* will receive from the users collection
-        public string? user_uid { get; set; } //* will receive from the users collection
+        public string? user_id { get; set; } //* will receive from the users collection
         public string checkindate { get; set; } = null!;
         public string checkoutdate { get; set; } = null!;
         public bool showreservation { get; set; } = true;

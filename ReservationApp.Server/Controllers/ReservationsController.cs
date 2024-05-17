@@ -10,10 +10,15 @@ namespace ReservationApp.Server.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly ReservationsService _reservationsService;
+        private readonly ListingsService _listingsService;
 
-        public ReservationsController(ReservationsService reservationsService)
+        public ReservationsController(
+            ReservationsService reservationsService,
+            ListingsService listingsService)
         {
             _reservationsService = reservationsService;
+            _listingsService = listingsService;
+
         }
 
         //http requests
@@ -24,18 +29,33 @@ namespace ReservationApp.Server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Reservation>> Get(string id)
         {
-            var listing = await _reservationsService.GetAsync(id);
+            var reservation = await _reservationsService.GetAsync(id);
 
-            if(listing == null)
+            if(reservation == null)
             {
                 return NotFound();
             }
-            return listing;
+            return reservation;
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(Reservation newReservation)
         {
+            var listing = await _listingsService.GetAsync(newReservation.listing_id);
+
+            if(listing == null) return NotFound();
+
+            if (listing.isbooked == true)
+            {
+                var errorMessage = new { Message = "Listing has been previouly booked!" };
+                return NotFound();
+            }
+
+            listing.isbooked = true; // set the listing booking status to true
+
+            //update it via the listingService
+            await _listingsService.UpdateAsync(newReservation.listing_id, listing);
+
             await _reservationsService.CreateAsync(newReservation);
 
             return CreatedAtAction(nameof(Get), new { Message = "Reservation created successfully", id = newReservation.id });
@@ -44,9 +64,9 @@ namespace ReservationApp.Server.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, Reservation updatedReservation)
         {
-            var listing = await _reservationsService.GetAsync(id);
+            var reservation = await _reservationsService.GetAsync(id);
 
-            if (listing == null)
+            if (reservation == null)
             {
                 return NotFound();
             }
@@ -56,12 +76,35 @@ namespace ReservationApp.Server.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id}/delete")]
+        public async Task<IActionResult> DeleteWithReason(string id, string listing_id, string reasoncancel)
+        {
+            //we get the reservation and its listing to be updated
+            var reservation = await _reservationsService.GetAsync(id);
+            var listing = await _listingsService.GetAsync(listing_id);
+            if (reservation == null || listing == null)
+            {
+                return NotFound();
+            }
+
+            //update it
+            reservation.showreservation = false;
+            reservation.reasoncancel = reasoncancel;
+            listing.isbooked = false;
+            
+            //pass it in after update
+            await _reservationsService.UpdateAsync(id, reservation);
+            await _listingsService.UpdateAsync(listing_id, listing);
+
+            return NoContent();
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var listing = await _reservationsService.GetAsync(id);
+            var reservation = await _reservationsService.GetAsync(id);
 
-            if(listing == null)
+            if(reservation == null)
             {
                 return NotFound();
             }
