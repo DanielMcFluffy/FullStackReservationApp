@@ -48,7 +48,7 @@ import { ImageModalComponent } from './listing-detail/image-modal/image-modal.co
     CalendarComponent,
     CheckoutComponent,
     DeletePopupComponent,
-    ImageModalComponent,
+    ImageModalComponent
   ],
   imports: [
     BrowserModule,

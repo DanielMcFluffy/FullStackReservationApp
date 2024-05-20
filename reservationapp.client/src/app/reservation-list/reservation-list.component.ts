@@ -72,4 +72,10 @@ export class ReservationListComponent implements OnInit, OnDestroy {
 
     // console.log(reservation.listing_id);
   }
+
+  calculateDays(checkInDate: Date, checkOutDate: Date): number {
+    const diffInMs = new Date(checkOutDate).getTime() - new Date(checkInDate).getTime();
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+    return Math.floor(diffInDays); // or Math.ceil(diffInDays) if you want to round up
+  }
 }

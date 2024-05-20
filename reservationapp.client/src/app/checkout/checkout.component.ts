@@ -127,7 +127,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           (error) => {
             console.log(error.error.message);
             if (
-              error.error.message === 'This listing has already been booked.'
+              error.error.message === 'Listing has been previouly booked!'
             ) {
               this.errorBookingMessage = true;
             }

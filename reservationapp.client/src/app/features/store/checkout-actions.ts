@@ -1,6 +1,9 @@
 import { createAction, props } from '@ngrx/store';
 import { Reservation } from '../../shared/models/reservation';
 
+//TODO:
+//refactor how this interface will be used between listing-detail/checkout/state-management system as it is being used in the Reservation interface and also as a parameter to be passed into the below addToCart reducer
+//ideally make it pass as 1 parameter instead of 2 as reservation should carry that information 
 export interface payloadListing {
   id: string;
   title: string;

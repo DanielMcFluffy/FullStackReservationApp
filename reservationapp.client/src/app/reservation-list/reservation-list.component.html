@@ -1,24 +1,38 @@
 <app-home></app-home>
 
-<h2 class="mt-5">Reservation List</h2>
+<h2 class="mt-5">Reservation Overview</h2>
 
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Reservation Name</th>
+      <th>Reservation</th>
       <th>Listing Id</th>
       <th>Email</th>
       <th>Check-In</th>
       <th>Check-Out</th>
+      <th>Booking Total</th>
+
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let reservation of reservations">
-      <td>{{ reservation.guestname }}</td>
+      <td>
+        <div>
+          <div class="mb-3">
+            {{ reservation.listingDetails!.title }}
+          </div>
+          <div>
+            <img src={{reservation.listingDetails!.image1}} alt={{reservation.listingDetails!.title}}>
+          </div>
+        </div>
+        </td>
       <td>{{ reservation.listing_id }}</td>
       <td>{{ reservation.guestemail }}</td>
       <td>{{ reservation.checkindate | date }}</td>
       <td>{{ reservation.checkoutdate | date }}</td>
+      <td>
+        RM{{ calculateDays(reservation.checkindate, reservation.checkoutdate)  * reservation.listingDetails!.price }} 
+      </td>
       <td>
         <button
           class="btn btn-danger btn-sm m-2"
