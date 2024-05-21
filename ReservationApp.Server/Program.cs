@@ -1,8 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using ReservationApp.Server.Helpers;
 using ReservationApp.Server.Models;
 using ReservationApp.Server.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,12 +47,65 @@ builder.Services.AddSingleton<ListingsService>();
 builder.Services.AddSingleton<ReservationsService>();
 builder.Services.AddSingleton<UsersService>();
 
-//builder.Services.AddAuthentication()
+//we register the authservice
+builder.Services.AddTransient<AuthService>();
+
+//this middleware returns a delegate to futher configure the auth scheme
+builder.Services
+    .AddAuthentication(x =>
+    {   //we set auth and challenge scheme as default
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(x =>
+    {
+        x.RequireHttpsMetadata = false;
+        x.SaveToken = true;
+        x.TokenValidationParameters = new TokenValidationParameters//validation config
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AuthSettings.PrivateKey)),
+            //no need to validate issuer and audience as of now
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+//finally we add authorization
+builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "JWT Authentication",
+        Description = "Enter your JWT token in this field",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    };
+
+    c.AddSecurityDefinition("Bearer", securityScheme);
+
+    var securityRequirement = new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    };
+
+    c.AddSecurityRequirement(securityRequirement);
+});
 
 var app = builder.Build();
 
@@ -65,6 +123,7 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

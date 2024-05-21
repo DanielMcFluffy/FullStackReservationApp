@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using ReservationApp.Server.Models;
 
@@ -17,18 +18,21 @@ namespace ReservationApp.Server.Services
             _userCollection = _database.GetCollection<User>(
                 "Users"); //initialize
         }
-
+        //get all users
         public async Task<List<User>> GetAsync() =>
             await _userCollection.Find(_ => true).ToListAsync();
-        public async Task<User?> GetByIdAsync(string id) =>
+        //get singular user
+        public async Task<User> GetAsync(string id) =>
             await _userCollection.Find(x => x.id == id).FirstOrDefaultAsync();
-
-        public async Task<User?> GetByUsernameAsync(string username) =>
+        //get user via username(email)
+        public async Task<User> GetByUsernameAsync(string username) =>
             await _userCollection.Find(x => x.username == username).FirstOrDefaultAsync();
+
+
         public async Task CreateAsync(User newUser) =>
             await _userCollection.InsertOneAsync(newUser);
-        //public async Task UpdateAsync(string id, Listing updatedUser) =>
-        //    await _userCollection.ReplaceOneAsync(x => x.id == id, updatedUser);
+        public async Task UpdateAsync(string id, User updatedUser) =>
+            await _userCollection.ReplaceOneAsync(x => x.id == id, updatedUser);
         public async Task RemoveAsync(string id) =>
             await _userCollection.DeleteOneAsync(x => x.id == id);
     }

@@ -1,26 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using ReservationApp.Server.Models;
+using ReservationApp.Server.Requests;
 using ReservationApp.Server.Services;
 using System.Security.Cryptography;
-
+using BC = BCrypt.Net.BCrypt;
 namespace ReservationApp.Server.Controllers
 {
-    public interface IAuthData
-    {
-        string token { get; set; }
-        string refreshToken { get; set; }
-    }
 
 
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly UsersService _usersService;
+        private readonly AuthService _authService;
 
-        public UsersController(UsersService usersService)
+        public UsersController(UsersService usersService,
+            AuthService authService)
         {
             _usersService = usersService;
+            _authService = authService;
         }
 
         //http requests
@@ -31,7 +31,7 @@ namespace ReservationApp.Server.Controllers
         [HttpGet("/users/{id}")]
         public async Task<ActionResult<User>> Get(string id)
         {
-            var user = await _usersService.GetByIdAsync(id);
+            var user = await _usersService.GetAsync(id);
 
             if(user == null)
             {
@@ -40,69 +40,109 @@ namespace ReservationApp.Server.Controllers
                 return NotFound(errorResponse);
             }
             return user;
+
         }
+
         //signup
-        [HttpPost("/signup")]
-        public async Task<IActionResult> Signup(User newUser)
+        [HttpPost("/register")] //this is for registration without auth0
+        public async Task<ActionResult<User>> Register(UserRequest request)
         {
-            var user = await _usersService.GetByUsernameAsync(newUser.username);
+            var existingUser = await _usersService.GetByUsernameAsync(request.username);
 
-            if(user != null)
+            if(existingUser != null)
             {
-                var errorResponse = new { Message = "Email has registered previously" };
-
+                var errorResponse = new { Message = "Email has previously registered an account!" };
                 return BadRequest(errorResponse);
             }
 
+            var hashPassword = BC.HashPassword(request.password);//bcrypt the password
 
-            await _usersService.CreateAsync(newUser);
+            var userData = new User()
+            {
+                username = request.username,
+                password = hashPassword,
+                datecreated = DateTime.UtcNow,
+            };
 
-            var successResponse = new { Message = "Registration successful", id = newUser.id };
+            await _usersService.CreateAsync(userData);
+            var successResponse = new { Success = true, UserRegistered = userData };
 
-            return CreatedAtAction(nameof(Get), successResponse);
+            return CreatedAtAction(nameof(Register), successResponse);
+
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Update(string id, User updatedUser)
+        [HttpPost("/login")]
+        public async Task<IActionResult> Login(UserRequest request)
+        {
+            //we first check if the account exists or not
+            var existingUser = await _usersService.GetByUsernameAsync(request.username);
+
+            //we check if the password matches
+            var passwordMatches = BC.Verify(request.password, existingUser.password);
+
+            if (existingUser == null || !passwordMatches)
+            {
+                var errorResponse = new { Message = "Incorrect credentials!" };
+
+                return BadRequest(errorResponse);
+
+            } 
+                //we first generate the refreshtoken
+                var refreshTokenInfo = await _authService.GenerateRefreshToken(); //we get a tuple
+
+                //then we insert this token into the database by updating the existing user's info
+                var userWithRefreshToken = new User()
+                {
+                    id = existingUser.id,
+                    uid = existingUser.uid,
+                    username = existingUser.username,
+                    password = existingUser.password,
+                    datecreated = existingUser.datecreated,
+                    refreshtoken = refreshTokenInfo.Item1, //the refreshtoken
+                    tokenexpires = refreshTokenInfo.Item2 //the expiry for refreshtoken
+                };
+                await _usersService.UpdateAsync(existingUser.id!, userWithRefreshToken);
+
+                //we then generate the accesstoken
+                var accessToken = await _authService.GenerateToken(userWithRefreshToken);
+
+                var authData = new
+                {   Message = "Login successful",
+                    refreshToken = refreshTokenInfo.Item1,
+                    token = accessToken,
+                };
+
+            return Ok(authData);
+        }
+
+        //[Authorize]
+        //[HttpGet("/signin")]
+        //public async Task<IActionResult> SignIn()
         //{
-        //    var user = await _usersService.GetAsync(id);
+        //    var SuccessMessage = new {Message = "success"};
 
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    await _usersService.UpdateAsync(id, updatedUser);
-
-        //    return NoContent();
+        //    return Ok(SuccessMessage);
         //}
 
-        ////////////////////
-        ///get back to this when you understand authentication
-
-        ////login
-        //[HttpPost("/login")]
-        //public async Task<ActionResult<IAuthData>> Login(User loginUser)
+        //[HttpPost("/authenticate")] //this endpoint provides token //ideally move this logic into the body of the signin function
+        //public async Task<IActionResult> Authenticate(User user)
         //{
-        //    var user = _usersService.GetByUsernameAsync(loginUser.username);
-
         //    if (user == null)
         //    {
-        //        return Unauthorized(new { Message = "Authentication failed" });
+        //        var errorResponse = new { Message = "Error not found" };
+
+        //        return NotFound(errorResponse);
         //    }
 
-        //    var newToken = SHA256.Create();
-
-            
-
+        //    var token = await _authService.GenerateToken(user);
+        //    return Ok(token);
 
         //}
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var user = await _usersService.GetByIdAsync(id);
+            var user = await _usersService.GetAsync(id);
 
             if(user == null)
             {

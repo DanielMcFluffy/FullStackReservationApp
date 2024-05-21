@@ -11,8 +11,14 @@ namespace ReservationApp.Server.Models
         // properties with * will need be passed their values somehow from the front-end (state management?)
         public string? id { get; set; } = null!; //* will need to pass this to reservations collection
         public string? uid { get; set; } //* will need to pass this to reservations collection
-        public string? username { get; set; } //* will need to pass this to reservations collection
-        public string? password { get; set; } = null!;
+        public string username { get; set; } = null!; //* will need to pass this to reservations collection
+
+        public string password { get; set; } = null!; //raw password will be bcrypted instead
+        public string? refreshtoken { get; set; }
+        public DateTime? tokenexpires { get; set; }
+        public DateTime? datecreated { get; set; } = DateTime.UtcNow;
+        //public string[]? Roles { get; set; }
+
 
     }
 }

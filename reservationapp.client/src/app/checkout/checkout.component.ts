@@ -120,12 +120,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           userId: 'test', 
           // token: this.token,
           listing_id: this.listingDetails!.id,
-          listingDetails: this.listingDetails
+          listingDetails: this.listingDetails,
         })
         .subscribe(
           () => this.router.navigate(['/list']),
           (error) => {
-            console.log(error.error.message);
+            console.log(error);
             if (
               error.error.message === 'Listing has been previouly booked!'
             ) {

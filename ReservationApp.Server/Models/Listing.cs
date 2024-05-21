@@ -10,7 +10,7 @@ namespace ReservationApp.Server.Models
 
         // properties with * will need be passed their values somehow from the front-end (state management?)
         public string? id { get; set; } = null!; //* passed to the reservation collection
-        public string? title { get; set; } = null!;
+        public string title { get; set; } = null!;
         public long price { get; set; }
         public string description { get; set; } = null!;
         public bool isbooked { get; set; } = false;
@@ -28,6 +28,7 @@ namespace ReservationApp.Server.Models
         public bool facility_laundry { get; set; } = false;
         public bool facility_parking { get; set; } = false;
         public bool facility_security { get; set; } = false;
+        public DateTime datecreated { get; set; }
 
 
 

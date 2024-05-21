@@ -22,12 +22,13 @@ namespace ReservationApp.Server.Models
         public string listing_id { get; set; } = null!; //* will receive from the listings collection
         public string guestname { get; set; } = null!;
         public string guestemail { get; set; } = null!; //* will receive from the users collection
-        public string? user_id { get; set; } //* will receive from the users collection
+        public string? user_id { get; set; } = null!; //* will receive from the users collection
         public string checkindate { get; set; } = null!;
         public string checkoutdate { get; set; } = null!;
         public bool showreservation { get; set; } = true;
         public string? reasoncancel { get; set; }
         public payloadListing? listingDetails { get; set; } 
+        public DateTime? datecreated { get; set; } = DateTime.UtcNow;
 
     }
 }
