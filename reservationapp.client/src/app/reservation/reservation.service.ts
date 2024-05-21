@@ -32,7 +32,7 @@ export class ReservationService {
 
   //get reservations based on username provided from token
 
-  getUserReservation(token: string | null): Observable<Reservation[]> {
+  getUserReservation(token: string): Observable<Reservation[]> {
     //endpoint expects a json request object with key 'token'
 
     return this.http.post<Reservation[]>(this.apiUrl + '/reservations/user', {

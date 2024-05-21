@@ -3,6 +3,8 @@ using MongoDB.Driver;
 using ReservationApp.Server.Models;
 using ReservationApp.Server.Requests;
 using ReservationApp.Server.Services;
+using System.IdentityModel.Tokens.Jwt;
+
 
 namespace ReservationApp.Server.Controllers
 {
@@ -12,13 +14,16 @@ namespace ReservationApp.Server.Controllers
     {
         private readonly ReservationsService _reservationsService;
         private readonly ListingsService _listingsService;
+        private readonly UsersService _usersService;
 
         public ReservationsController(
             ReservationsService reservationsService,
-            ListingsService listingsService)
+            ListingsService listingsService,
+            UsersService usersService)
         {
             _reservationsService = reservationsService;
             _listingsService = listingsService;
+            _usersService = usersService;
 
         }
 
@@ -37,6 +42,21 @@ namespace ReservationApp.Server.Controllers
                 return NotFound();
             }
             return reservation;
+        }
+
+        //get reservation by user [authorize]
+        [HttpPost("user")]
+        public async Task<List<Reservation>> GetUserReservation([FromBody] GetReservationByIdRequest request)
+        {
+            //we'll receive the token from the body and decode it
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var securityToken = tokenHandler.ReadToken(request.token) as JwtSecurityToken;
+
+            var userIdClaim = securityToken!.Claims.First(claim => claim.Type == "user_id");
+            var user_id = userIdClaim.Value; //the decoded value
+            //Console.WriteLine(user_id);
+            return await _reservationsService.GetReservationByUserAsync(user_id);
+
         }
 
         [HttpPost]

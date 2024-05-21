@@ -30,14 +30,14 @@ export class ReservationFormComponent implements OnInit {
   ngOnInit(): void {
     //////////////////////////////////
     //FOR DEVELOPMENT PURPOSES
-    // if (this.token) {
-    //   const username =
-    //     jwtDecode<{ username: string }>(this.token).username ||
-    //     jwtDecode<{ email: string }>(this.token).email;
+    if (this.token) {
+      const username =
+        jwtDecode<{ username: string }>(this.token).username ||
+        jwtDecode<{ email: string }>(this.token).email;
 
-    //   this.userEmail = username;
+      this.userEmail = username;
       
-    // }
+    }
     //////////////////////////////////
 
 

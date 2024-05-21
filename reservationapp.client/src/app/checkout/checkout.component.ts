@@ -39,7 +39,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   //username(email) and id/uid from token
   token!: string | null;
   username!: string;
-  userId!: string | number;
+  userId!: string;
 /////////////////////////////////////////////////////////////
 
   //days of reservation
@@ -85,15 +85,16 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     //FOR DEVELOPMENT PURPOSES
 
     //extract out user info from the token
-    // this.token = this.accountsService.getToken();
-    // if (this.token) {
-    //   const { username, id } = jwtDecode<{
-    //     username: string;
-    //     id: string | number;
-    //   }>(this.token);
-    //   this.username = username;
-    //   this.userId = id;
-    // }
+    this.token = this.accountsService.getToken();
+    if (this.token) {
+      const { email, user_id } = jwtDecode<{
+        email: string;
+        user_id: string;
+      }>(this.token);
+      this.username = email;
+      this.userId = user_id;
+      console.log(this.username, this.userId);
+    }
     /////////////////////////////////////////////////////////////
   }
 
@@ -108,16 +109,16 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     console.log(this.reservationEmail.value);
 /////////////////////////////////////////////////////////////
     //FOR DEVELOPMENT PURPOSES
-    // if (this.reservationDetails && this.token && this.reservationName.dirty) {
+    // if (this.reservationDetails && this.reservationName.dirty) {
       
-      if (this.reservationDetails && this.reservationName.dirty) {
+      if (this.reservationDetails && this.token && this.reservationName.dirty) {
       this.reservationService
         .addReservation({
           ...this.reservationDetails,
           guestname: this.reservationName.value,
           guestemail: this.reservationEmail.value,
-          // userId: this.userId,
-          userId: 'test', 
+          user_id: this.userId!,
+          // userId: 'test', 
           // token: this.token,
           listing_id: this.listingDetails!.id,
           listingDetails: this.listingDetails,

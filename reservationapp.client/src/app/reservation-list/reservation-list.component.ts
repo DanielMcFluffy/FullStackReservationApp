@@ -28,15 +28,15 @@ export class ReservationListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     ////////////////////////////////////////////
     //FOR DEVELOPMENT PURPOSES
-    // if (this.token) {
-      // this.reservationService
-      //   .getUserReservation(this.token)
-      //   .subscribe((userReservations: Reservation[]) => {
-      //     this.reservations = userReservations;
-      //     console.log(this.reservations);
-      //     this.isLoading = false;
-      //   });
-    // }
+    if (this.token) {
+      this.reservationService
+        .getUserReservation(this.token)
+        .subscribe((userReservations: Reservation[]) => {
+          this.reservations = userReservations;
+          console.log(this.reservations);
+          this.isLoading = false;
+        });
+    }
 
     this.reservationService.getReservations()
       .subscribe(reservations => {

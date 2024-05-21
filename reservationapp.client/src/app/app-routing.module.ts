@@ -21,7 +21,7 @@ const routes: Routes = [
   {
     path: 'list',
     //FOR DEVELOPMENT PURPOSES
-    // canActivate: [activateGuard],
+    canActivate: [activateGuard],
     component: ReservationListComponent,
     children: [{ path: ':username', component: ReservationListComponent }],
   },
@@ -33,7 +33,7 @@ const routes: Routes = [
   {
     path: 'edit/:id',
     //FOR DEVELOPMENT PURPOSES
-    // canActivate: [activateGuard],
+    canActivate: [activateGuard],
     component: ReservationFormComponent,
   },
   { path: '404NotFound', component: ErrorPageComponent },

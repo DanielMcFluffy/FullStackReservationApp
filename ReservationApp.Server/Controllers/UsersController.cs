@@ -72,7 +72,7 @@ namespace ReservationApp.Server.Controllers
         }
 
         [HttpPost("/login")]
-        public async Task<IActionResult> Login(UserRequest request)
+        public async Task<IActionResult> Login([FromBody] UserRequest request)
         {
             //we first check if the account exists or not
             var existingUser = await _usersService.GetByUsernameAsync(request.username);

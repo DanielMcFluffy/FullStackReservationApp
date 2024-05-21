@@ -60,7 +60,13 @@ namespace ReservationApp.Server.Services
         {
             var claims = new ClaimsIdentity(); //initialize a claim
 
-            claims.AddClaim(new Claim(ClaimTypes.Email, user.username));//here we add add the username(email) as a claim
+            //here we add add the username(email) as a claim
+            claims.AddClaim(new Claim(ClaimTypes.Email, user.username));
+            
+            //if uid exists, it implies it's from an OAuth account, use that instead
+            var userIdClaimValue = string.IsNullOrEmpty(user.uid) ? user.id : user.uid;
+
+            claims.AddClaim(new Claim("user_id", userIdClaimValue!));
 
             //below handles roles to be added into the claim if implemented
 

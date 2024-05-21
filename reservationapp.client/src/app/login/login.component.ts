@@ -67,9 +67,10 @@ export class LoginComponent implements OnInit {
     // //extract out email/password
     const { email, password } = this.loginForm.value;
     // //plug them in here
-    this.accountsService.loginAccount(email, password).subscribe((authData) => {
+    this.accountsService.loginAccount(email, password).subscribe(
+      (authData) => {
       // extract out auth and token
-      const { auth, token, refreshToken } = authData;
+      const { token, refreshToken } = authData;
       console.log(authData);
       // set token in localstorage
       localStorage.setItem('accessToken', token);
@@ -77,8 +78,18 @@ export class LoginComponent implements OnInit {
       if (token && refreshToken) {
         this.successMessage.set(true);
       }
-      this.dialog.closeAll();
-      this.router.navigate(['/landing']);
-    });
+      setTimeout(() => {
+        this.dialog.closeAll();
+        this.router.navigate(['/landing']);
+      }, 800);
+    },
+      (error) => {
+        console.log(error);
+        this.errorMessage.set(true);
+        setTimeout(() => {
+          this.errorMessage.set(false);
+        }, 1000);
+      }
+  )
   }
 }

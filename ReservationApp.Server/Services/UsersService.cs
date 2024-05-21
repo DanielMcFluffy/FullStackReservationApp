@@ -27,8 +27,6 @@ namespace ReservationApp.Server.Services
         //get user via username(email)
         public async Task<User> GetByUsernameAsync(string username) =>
             await _userCollection.Find(x => x.username == username).FirstOrDefaultAsync();
-
-
         public async Task CreateAsync(User newUser) =>
             await _userCollection.InsertOneAsync(newUser);
         public async Task UpdateAsync(string id, User updatedUser) =>
