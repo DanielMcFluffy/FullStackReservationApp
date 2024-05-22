@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
+import { NgModule, importProvidersFrom } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeModule } from './home/home.module';
 import { ReservationModule } from './reservation/reservation.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { HeaderComponent } from './header/header.component';
 import { LoginComponent } from './login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -33,6 +33,7 @@ import { StoreModule } from '@ngrx/store';
 import { checkoutReducer } from './features/store/checkout-reducer';
 import { DeletePopupComponent } from './reservation-list/delete-popup/delete-popup.component';
 import { ImageModalComponent } from './listing-detail/image-modal/image-modal.component';
+import { AuthInterceptor } from './shared/http-interceptors/auth-interceptor';
 @NgModule({
   declarations: [
     AppComponent,
@@ -48,7 +49,7 @@ import { ImageModalComponent } from './listing-detail/image-modal/image-modal.co
     CalendarComponent,
     CheckoutComponent,
     DeletePopupComponent,
-    ImageModalComponent
+    ImageModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -77,7 +78,11 @@ import { ImageModalComponent } from './listing-detail/image-modal/image-modal.co
     ),
     provideAuth(() => getAuth()),
   ],
-  providers: [provideAnimationsAsync()],
+  providers: [
+    provideAnimationsAsync(),
+    importProvidersFrom(HttpClientModule),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

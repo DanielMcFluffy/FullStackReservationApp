@@ -10,6 +10,15 @@ namespace ReservationApp.Server.Services
 {
     public class AuthService //this class will take care of JWT token generation
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public AuthService(IHttpContextAccessor httpContextAccessor)
+        {
+
+            _httpContextAccessor = httpContextAccessor;
+
+        }
+
         public async Task<string> GenerateToken(User user)
         {
             var handler = new JwtSecurityTokenHandler(); //initialize JWT token handler
@@ -87,6 +96,30 @@ namespace ReservationApp.Server.Services
 
             return claims;
 
+        }
+
+        public async Task<string> DecodeTokenClaimFromHeader(string claimType)
+        {
+           var claim = await Task.Run(() =>
+            {
+                //we'll receive the token from the body and decode it
+                var tokenWithBearer = _httpContextAccessor.HttpContext!.Request.Headers["Authorization"].FirstOrDefault();
+                if (string.IsNullOrEmpty(tokenWithBearer))
+                {
+                    throw new ArgumentException("Missing Authorization Header");
+                }
+
+                // Remove "Bearer " from the token
+                var token = tokenWithBearer.Replace("Bearer ", "");
+
+                // Decode the token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var securityToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+                return securityToken!.Claims.First(claim => claim.Type == claimType);
+            });
+
+            return claim.Value;
         }
     }
 }

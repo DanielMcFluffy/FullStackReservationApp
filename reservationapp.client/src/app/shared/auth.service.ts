@@ -5,7 +5,6 @@ import {
   UserCredential,
   signInWithPopup,
 } from 'firebase/auth';
-import { jwtDecode } from 'jwt-decode';
 import { AccountsService } from './accounts.service';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -18,17 +17,6 @@ export class AuthService {
     private accountsService: AccountsService,
     private dialog: MatDialog
   ) {}
-
-  isTokenExpired(token: string): boolean {
-    try {
-      const decoded: any = jwtDecode(token);
-      // console.log(decoded);
-      return decoded.exp < Date.now() / 1000;
-    } catch (error) {
-      console.error('Failed to decode token', error);
-      return true;
-    }
-  }
 
   // private checkAuthState(): void {
   //   onAuthStateChanged(this.firebaseAuth, (user) => {
@@ -60,11 +48,11 @@ export class AuthService {
           )
           .subscribe((authData) => {
             // TODO: not sure what to do with auth:boolean
-            const { auth, token, refreshToken } = authData;
+            const { token, refreshToken } = authData;
             console.log(authData);
 
-            localStorage.setItem('accessToken', token);
-            localStorage.setItem('refreshToken', refreshToken);
+            localStorage.setItem('accessToken', token!);
+            localStorage.setItem('refreshToken', refreshToken!);
             this.dialog.closeAll();
           });
         return result;

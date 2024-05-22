@@ -1,5 +1,5 @@
-export interface LoginAuth {
-  auth: boolean,
-  token: string,
-  refreshToken: string
+export interface AuthData {
+  message: string;
+  token?: string;
+  refreshToken?: string;
 }

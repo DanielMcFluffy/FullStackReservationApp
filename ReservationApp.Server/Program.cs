@@ -49,6 +49,7 @@ builder.Services.AddSingleton<UsersService>();
 
 //we register the authservice
 builder.Services.AddTransient<AuthService>();
+builder.Services.AddHttpContextAccessor();
 
 //this middleware returns a delegate to futher configure the auth scheme
 builder.Services

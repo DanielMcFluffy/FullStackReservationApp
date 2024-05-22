@@ -23,10 +23,10 @@ namespace ReservationApp.Server.Services
         public async Task<Reservation> GetAsync(string id) =>
             await _reservationCollection.Find(x => x.id == id).FirstOrDefaultAsync();
         //get reservations based on user_id who had booked it
-        public async Task<List<Reservation>> GetReservationByUserAsync(string id){
-            Console.WriteLine("running the getuser reservation");
-          return  await _reservationCollection.Find(x => x.user_id == id).ToListAsync();
-    }
+        public async Task<List<Reservation>> GetReservationByUserAsync(string id) =>
+          await _reservationCollection.Find(x => x.user_id == id && x.showreservation == true).ToListAsync();
+        public async Task<List<Reservation>> GetAllReservationByUserAsync(string id) =>
+     await _reservationCollection.Find(x => x.user_id == id).ToListAsync();
         public async Task CreateAsync(Reservation newReservation) =>
             await _reservationCollection.InsertOneAsync(newReservation);
         public async Task UpdateAsync(string id, Reservation updatedReservation) =>

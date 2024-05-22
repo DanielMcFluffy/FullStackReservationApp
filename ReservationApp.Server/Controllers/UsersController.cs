@@ -24,24 +24,25 @@ namespace ReservationApp.Server.Controllers
         }
 
         //http requests
-        [HttpGet("/users")]
-        public async Task<List<User>> Get() =>
-            await _usersService.GetAsync();
 
-        [HttpGet("/users/{id}")]
-        public async Task<ActionResult<User>> Get(string id)
-        {
-            var user = await _usersService.GetAsync(id);
+        //[HttpGet("/users")]
+        //public async Task<List<User>> Get() =>
+        //    await _usersService.GetAsync();
 
-            if(user == null)
-            {
-               var errorResponse = new { Message = "User does not exist" };
+        //[HttpGet("/users/{id}")]
+        //public async Task<ActionResult<User>> Get(string id)
+        //{
+        //    var user = await _usersService.GetAsync(id);
 
-                return NotFound(errorResponse);
-            }
-            return user;
+        //    if(user == null)
+        //    {
+        //       var errorResponse = new { Message = "User does not exist" };
 
-        }
+        //        return NotFound(errorResponse);
+        //    }
+        //    return user;
+
+        //}
 
         //signup
         [HttpPost("/register")] //this is for registration without auth0
@@ -51,7 +52,7 @@ namespace ReservationApp.Server.Controllers
 
             if(existingUser != null)
             {
-                var errorResponse = new { Message = "Email has previously registered an account!" };
+                var errorResponse = new { message = "Email has previously registered an account!" };
                 return BadRequest(errorResponse);
             }
 
@@ -82,7 +83,7 @@ namespace ReservationApp.Server.Controllers
 
             if (existingUser == null || !passwordMatches)
             {
-                var errorResponse = new { Message = "Incorrect credentials!" };
+                var errorResponse = new { message = "Incorrect credentials!" };
 
                 return BadRequest(errorResponse);
 
@@ -107,7 +108,7 @@ namespace ReservationApp.Server.Controllers
                 var accessToken = await _authService.GenerateToken(userWithRefreshToken);
 
                 var authData = new
-                {   Message = "Login successful",
+                {   message = "Login successful",
                     refreshToken = refreshTokenInfo.Item1,
                     token = accessToken,
                 };
@@ -115,29 +116,74 @@ namespace ReservationApp.Server.Controllers
             return Ok(authData);
         }
 
-        //[Authorize]
-        //[HttpGet("/signin")]
-        //public async Task<IActionResult> SignIn()
-        //{
-        //    var SuccessMessage = new {Message = "success"};
+        [HttpGet("/access")]
+        public async Task<IActionResult> GenerateUserAccessToken()
+        {
+            var user_id = await _authService.DecodeTokenClaimFromHeader("user_id"); //get the user_id from the token
 
-        //    return Ok(SuccessMessage);
-        //}
+            var userData = await _usersService.GetAsync(user_id);
 
-        //[HttpPost("/authenticate")] //this endpoint provides token //ideally move this logic into the body of the signin function
-        //public async Task<IActionResult> Authenticate(User user)
-        //{
-        //    if (user == null)
-        //    {
-        //        var errorResponse = new { Message = "Error not found" };
+            if (userData == null)
+            {
+                var errorResponse = new { message = "User does not exist" };
 
-        //        return NotFound(errorResponse);
-        //    }
+                return NotFound(errorResponse);
+            }
 
-        //    var token = await _authService.GenerateToken(user);
-        //    return Ok(token);
+            //check if the refreshtoken is still valid
 
-        //}
+            if (DateTime.UtcNow > userData.tokenexpires)
+            {
+                var errorResponse = new { message = "Refresh token has expired" };
+
+                return BadRequest(errorResponse);
+            }
+
+            //generate a new accesstoken
+
+            var accessToken = await _authService.GenerateToken(userData);
+
+            var authData = new
+            {
+                message = "Access token generated",
+                token = accessToken,
+            };
+
+           return Ok(authData);
+        }
+
+        [Authorize]
+        [HttpGet("/refresh")]
+        public async Task<IActionResult> GenerateUserRefreshToken()
+        {
+
+            var user_id = await _authService.DecodeTokenClaimFromHeader("user_id"); //get the user_id from the token
+            
+            var refreshTokenInfo =  await _authService.GenerateRefreshToken(); //generate a new refreshtoken
+
+            var user = await _usersService.GetAsync(user_id); //get the user
+
+            var userWithNewRefreshToken = new User()
+            {
+                id = user.id,
+                uid = user.uid,
+                username = user.username,
+                password = user.password,
+                datecreated = user.datecreated,
+                refreshtoken = refreshTokenInfo.Item1, //the refreshtoken
+                tokenexpires = refreshTokenInfo.Item2 //the expiry for refreshtoken
+            };
+
+            await _usersService.UpdateAsync(user_id, userWithNewRefreshToken); //update the user with the new refreshtoken
+
+            var authData = new
+            {
+                message = "Refresh token generated",
+                refreshToken = refreshTokenInfo.Item1,
+            };
+
+            return Ok(authData);
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)

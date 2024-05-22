@@ -1,4 +1,4 @@
-import { payloadListing } from "../../features/store/checkout-actions";
+import { payloadListing } from '../../features/store/checkout-actions';
 
 export interface Reservation {
   id?: string;
@@ -9,6 +9,5 @@ export interface Reservation {
   checkoutdate: Date;
   user_id?: string;
   reasonCancel?: string;
-  token?: string | number;
   listingDetails?: payloadListing | null; //this should contain details about listing such as img url, etc
 }

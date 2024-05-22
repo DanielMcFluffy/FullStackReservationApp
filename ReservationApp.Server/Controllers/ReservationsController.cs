@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using ReservationApp.Server.Models;
 using ReservationApp.Server.Requests;
@@ -8,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace ReservationApp.Server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("reservations/")]
     public class ReservationsController : ControllerBase
@@ -15,22 +17,27 @@ namespace ReservationApp.Server.Controllers
         private readonly ReservationsService _reservationsService;
         private readonly ListingsService _listingsService;
         private readonly UsersService _usersService;
+        private readonly AuthService _authService;
 
         public ReservationsController(
             ReservationsService reservationsService,
             ListingsService listingsService,
-            UsersService usersService)
+            UsersService usersService,
+            AuthService authService)
         {
             _reservationsService = reservationsService;
             _listingsService = listingsService;
             _usersService = usersService;
+            _authService = authService;
 
         }
 
         //http requests
+ 
         [HttpGet]
         public async Task<List<Reservation>> Get() =>
             await _reservationsService.GetAsync();
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Reservation>> Get(string id)
@@ -44,17 +51,14 @@ namespace ReservationApp.Server.Controllers
             return reservation;
         }
 
-        //get reservation by user [authorize]
-        [HttpPost("user")]
-        public async Task<List<Reservation>> GetUserReservation([FromBody] GetReservationByIdRequest request)
-        {
-            //we'll receive the token from the body and decode it
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var securityToken = tokenHandler.ReadToken(request.token) as JwtSecurityToken;
+        //get reservation by user 
 
-            var userIdClaim = securityToken!.Claims.First(claim => claim.Type == "user_id");
-            var user_id = userIdClaim.Value; //the decoded value
-            //Console.WriteLine(user_id);
+        [HttpGet("user")]
+        public async Task<List<Reservation>> GetUserReservation()
+        {
+
+            var user_id = await _authService.DecodeTokenClaimFromHeader("user_id");
+
             return await _reservationsService.GetReservationByUserAsync(user_id);
 
         }
@@ -68,7 +72,7 @@ namespace ReservationApp.Server.Controllers
 
             if (listing.isbooked == true)
             {
-                var errorMessage = new { Message = "Listing has been previouly booked!" };
+                var errorMessage = new { message = "Listing has been previouly booked!" };
                 return NotFound(errorMessage);
             }
 
@@ -79,7 +83,7 @@ namespace ReservationApp.Server.Controllers
 
             await _reservationsService.CreateAsync(newReservation);
 
-            return CreatedAtAction(nameof(Get), new { Message = "Reservation created successfully", id = newReservation.id });
+            return CreatedAtAction(nameof(Get), new { message = "Reservation created successfully", id = newReservation.id });
         }
 
         [HttpPut("{id}")]

@@ -11,7 +11,7 @@ namespace ReservationApp.Server.Models
         public string description { get; set; } = null!;
         public string image1 { get; set; } = null!; 
     }
-
+    [BsonIgnoreExtraElements] //add this if you're using mongodb atlas to store data -- on atlas db, we have an additional objectid field so this attribute ignores that and maps our models accurately
     public class Reservation
     {
         [BsonId] //this defines the Id -- it will make it a primary key

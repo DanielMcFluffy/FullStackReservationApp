@@ -9,8 +9,7 @@ import { Observable } from 'rxjs';
 export class ReservationService {
   private reservations: Reservation[] = [];
   //specify api url
-  private apiUrl =
-    'https://localhost:7066';
+  private apiUrl = 'https://localhost:7066';
 
   //inject the http entity to be used in methods
   constructor(private http: HttpClient) {}
@@ -32,12 +31,10 @@ export class ReservationService {
 
   //get reservations based on username provided from token
 
-  getUserReservation(token: string): Observable<Reservation[]> {
+  getUserReservation(): Observable<Reservation[]> {
     //endpoint expects a json request object with key 'token'
 
-    return this.http.post<Reservation[]>(this.apiUrl + '/reservations/user', {
-      token,
-    });
+    return this.http.get<Reservation[]>(this.apiUrl + '/reservations/user');
   }
 
   addReservation(reservation: Reservation): Observable<void> {
@@ -49,10 +46,13 @@ export class ReservationService {
     listing_id: string,
     reasoncancel: string
   ): Observable<void> {
-    return this.http.put<void>(this.apiUrl + '/reservations/' + id + '/delete', {
-      listing_id,
-      reasoncancel,
-    });
+    return this.http.put<void>(
+      this.apiUrl + '/reservations/' + id + '/delete',
+      {
+        listing_id,
+        reasoncancel,
+      }
+    );
   }
 
   updateReservation(

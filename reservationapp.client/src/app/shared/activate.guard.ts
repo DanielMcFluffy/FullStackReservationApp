@@ -5,25 +5,23 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-import { AuthService } from './auth.service';
-import { AccountsService } from './accounts.service';
+import { TokenService } from './token.service';
 
 export const activateGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
-  const authService = inject(AuthService);
-  const accountsService = inject(AccountsService);
+  const tokenService = inject(TokenService);
   const router = inject(Router);
 
-  const token = accountsService.getToken();
+  const token = tokenService.getToken();
 
-  if (token && !authService.isTokenExpired(token)) {
+  if (token && !tokenService.isTokenExpired(token)) {
     return true;
   } else {
     router.navigate(['/login']);
     console.log(token);
-    console.log(token && !authService.isTokenExpired(token));
+    console.log(token && !tokenService.isTokenExpired(token));
     return false;
   }
 };

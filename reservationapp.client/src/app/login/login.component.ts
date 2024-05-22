@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { RegisterComponent } from '../register/register.component';
 import { AccountsService } from '../shared/accounts.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../shared/auth.service';
+import { TokenService } from '../shared/token.service';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,7 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
     private accountsService: AccountsService,
+    private tokenService: TokenService,
     private router: Router,
     private authService: AuthService
   ) {}
@@ -52,7 +54,7 @@ export class LoginComponent implements OnInit {
   async handleGoogleSignIn() {
     try {
       await this.authService.loginGoogle(); // Wait for sign-in to complete
-      if (this.accountsService.getToken()) {
+      if (this.tokenService.getToken()) {
         // Check token after sign-in completes
         this.successMessage.set(true);
         this.dialog.closeAll();
@@ -69,20 +71,20 @@ export class LoginComponent implements OnInit {
     // //plug them in here
     this.accountsService.loginAccount(email, password).subscribe(
       (authData) => {
-      // extract out auth and token
-      const { token, refreshToken } = authData;
-      console.log(authData);
-      // set token in localstorage
-      localStorage.setItem('accessToken', token);
-      localStorage.setItem('refreshToken', refreshToken);
-      if (token && refreshToken) {
-        this.successMessage.set(true);
-      }
-      setTimeout(() => {
-        this.dialog.closeAll();
-        this.router.navigate(['/landing']);
-      }, 800);
-    },
+        // extract out auth and token
+        const { token, refreshToken } = authData;
+        console.log(authData);
+        // set token in localstorage
+        localStorage.setItem('accessToken', token!);
+        localStorage.setItem('refreshToken', refreshToken!);
+        if (token && refreshToken) {
+          this.successMessage.set(true);
+        }
+        setTimeout(() => {
+          this.dialog.closeAll();
+          this.router.navigate(['/landing']);
+        }, 800);
+      },
       (error) => {
         console.log(error);
         this.errorMessage.set(true);
@@ -90,6 +92,6 @@ export class LoginComponent implements OnInit {
           this.errorMessage.set(false);
         }, 1000);
       }
-  )
+    );
   }
 }

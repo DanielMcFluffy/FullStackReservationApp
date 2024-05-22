@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using ReservationApp.Server.Models;
 using ReservationApp.Server.Services;
@@ -32,7 +33,7 @@ namespace ReservationApp.Server.Controllers
             }
             return listing;
         }
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Post(Listing newListing)
         {
@@ -51,7 +52,7 @@ namespace ReservationApp.Server.Controllers
 
         //    return NoContent();
         //}
-
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, Listing updatedListing)
         {
@@ -66,7 +67,7 @@ namespace ReservationApp.Server.Controllers
 
             return NoContent();
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

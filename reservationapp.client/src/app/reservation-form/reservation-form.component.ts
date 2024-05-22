@@ -5,6 +5,7 @@ import { Reservation } from '../shared/models/reservation';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AccountsService } from '../shared/accounts.service';
 import { jwtDecode } from 'jwt-decode';
+import { TokenService } from '../shared/token.service';
 @Component({
   selector: 'app-reservation-form',
   templateUrl: './reservation-form.component.html',
@@ -16,7 +17,7 @@ export class ReservationFormComponent implements OnInit {
   today!: string;
 
   //access user's email if exists
-  token = this.accountsService.getToken();
+  token = this.tokenService.getToken();
   userEmail!: string;
 
   constructor(
@@ -24,26 +25,21 @@ export class ReservationFormComponent implements OnInit {
     private reservationService: ReservationService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private accountsService: AccountsService
+    private tokenService: TokenService
   ) {}
 
   ngOnInit(): void {
-    //////////////////////////////////
-    //FOR DEVELOPMENT PURPOSES
     if (this.token) {
       const username =
         jwtDecode<{ username: string }>(this.token).username ||
         jwtDecode<{ email: string }>(this.token).email;
 
       this.userEmail = username;
-      
     }
-    //////////////////////////////////
 
-
-/////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
     //below initialization can be refactored or modified, it's legacy code from startng to learn angular
-    
+
     const currentDate = new Date();
     this.today = currentDate.toISOString().split('T')[0];
 
@@ -82,7 +78,7 @@ export class ReservationFormComponent implements OnInit {
     }
   }
   //use formBuilder to arrange the formControlName data we've defined in the view template in the class component
-/////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
   onSubmit() {
     if (this.reservationForm.valid) {
       //call the reservationForm and access its value

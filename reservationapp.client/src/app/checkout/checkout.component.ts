@@ -10,9 +10,10 @@ import { BookingDates } from '../shared/models/booking-dates';
 import { Subscription } from 'rxjs';
 import { NgModel } from '@angular/forms';
 import { jwtDecode } from 'jwt-decode';
-import { AccountsService } from '../shared/accounts.service';
+
 import { ReservationService } from '../reservation/reservation.service';
 import { Router } from '@angular/router';
+import { TokenService } from '../shared/token.service';
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
@@ -23,7 +24,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     private location: Location,
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private accountsService: AccountsService,
+    private tokenService: TokenService,
     private reservationService: ReservationService,
     private router: Router
   ) {}
@@ -33,14 +34,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   //checkout status
   status!: string;
-/////////////////////////////////////////////////////////////
-    //FOR DEVELOPMENT PURPOSES
 
   //username(email) and id/uid from token
   token!: string | null;
   username!: string;
   userId!: string;
-/////////////////////////////////////////////////////////////
 
   //days of reservation
   bookedDays!: number;
@@ -81,11 +79,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         (checkOutDate.valueOf() - checkInDate.valueOf()) / (1000 * 60 * 60 * 24)
       );
     });
-/////////////////////////////////////////////////////////////
-    //FOR DEVELOPMENT PURPOSES
 
     //extract out user info from the token
-    this.token = this.accountsService.getToken();
+    this.token = this.tokenService.getToken();
     if (this.token) {
       const { email, user_id } = jwtDecode<{
         email: string;
@@ -95,7 +91,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.userId = user_id;
       console.log(this.username, this.userId);
     }
-    /////////////////////////////////////////////////////////////
   }
 
   ngOnDestroy(): void {
@@ -107,18 +102,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     console.log(this.reservationDetails, this.listingDetails, this.status);
     console.log(this.reservationName.value);
     console.log(this.reservationEmail.value);
-/////////////////////////////////////////////////////////////
-    //FOR DEVELOPMENT PURPOSES
-    // if (this.reservationDetails && this.reservationName.dirty) {
-      
-      if (this.reservationDetails && this.token && this.reservationName.dirty) {
+
+    if (this.reservationDetails && this.token && this.reservationName.dirty) {
       this.reservationService
         .addReservation({
           ...this.reservationDetails,
           guestname: this.reservationName.value,
           guestemail: this.reservationEmail.value,
           user_id: this.userId!,
-          // userId: 'test', 
           // token: this.token,
           listing_id: this.listingDetails!.id,
           listingDetails: this.listingDetails,
@@ -127,9 +118,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           () => this.router.navigate(['/list']),
           (error) => {
             console.log(error);
-            if (
-              error.error.message === 'Listing has been previouly booked!'
-            ) {
+            if (error.error.message === 'Listing has been previouly booked!') {
               this.errorBookingMessage = true;
             }
           }
@@ -140,9 +129,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.errorLoginMessage = true;
     }
   }
-
-/////////////////////////////////////////////////////////////
-
 
   editDate() {
     const dialogRef = this.dialog.open(CalendarComponent, {

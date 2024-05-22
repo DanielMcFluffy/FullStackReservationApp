@@ -2,38 +2,32 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 
 import { jwtDecode } from 'jwt-decode';
-import { Observable } from 'rxjs';
-import { LoginAuth } from './models/auth';
+import { Observable, of, throwError } from 'rxjs';
+import { AuthData } from './models/auth';
+import { AuthService } from './auth.service';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AccountsService {
-  apiUrl: string =
-    'https://localhost:7066';
+  apiUrl: string = 'https://localhost:7066';
 
   //success/error message for UI
   successMessage = signal(false);
   errorMessage = signal(false);
   usernameExistError = signal(false);
 
-  username = this.getToken()
-    ? jwtDecode<{ username: string }>(this.getToken() as string).username
+  username = this.tokenService.getToken()
+    ? jwtDecode<{ username: string }>(this.tokenService.getToken() as string)
+        .username
     : null;
 
-  constructor(private http: HttpClient) {}
-
-  getToken(): string | null {
-    return localStorage.getItem('accessToken');
-  }
-
-  getRefreshToken(): string | null {
-    return localStorage.getItem('refreshToken');
-  }
+  constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   registerAccount(username: string, password: string): Observable<void> {
     // console.log({username, password})
-    return this.http.post<void>(this.apiUrl + '/signup', {
+    return this.http.post<void>(this.apiUrl + '/register', {
       username,
       password,
     });
@@ -42,27 +36,18 @@ export class AccountsService {
   registerThirdPartyAccount(
     username: string,
     uid: string
-  ): Observable<LoginAuth> {
-    return this.http.post<LoginAuth>(this.apiUrl + '/login_third-party', {
+  ): Observable<AuthData> {
+    return this.http.post<AuthData>(this.apiUrl + '/login_third-party', {
       username,
       uid,
     });
   }
 
-  loginAccount(username: string, password: string): Observable<LoginAuth> {
-    return this.http.post<LoginAuth>(this.apiUrl + '/login', {
+  loginAccount(username: string, password: string): Observable<AuthData> {
+    return this.http.post<AuthData>(this.apiUrl + '/login', {
       username,
       password,
     });
-  }
-
-  requestRefreshToken(
-    refreshToken: string
-  ): Observable<{ auth: boolean; token: string }> {
-    return this.http.post<{ auth: boolean; token: string }>(
-      this.apiUrl + '/refresh_token',
-      { refreshToken }
-    );
   }
 
   logoutAccount() {

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountsService } from '../shared/accounts.service';
+import { TokenService } from '../shared/token.service';
 
 @Component({
   selector: 'app-home',
@@ -7,19 +8,12 @@ import { AccountsService } from '../shared/accounts.service';
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
-  constructor(private accountsService: AccountsService) {}
+  constructor(private tokenService: TokenService) {}
 
   ngOnInit(): void {
-    const refreshToken = this.accountsService.getRefreshToken();
-    // console.log(refreshToken);
-    if (refreshToken) {
-      this.accountsService
-        .requestRefreshToken(refreshToken)
-        .subscribe((newAccessToken) => {
-          const { token } = newAccessToken;
-          localStorage.setItem('accessToken', token);
-          console.log(token);
-        });
-    }
+    this.tokenService.requestRefreshToken().subscribe((authData) => {
+      const { refreshToken } = authData!;
+      localStorage.setItem('refreshToken', refreshToken!);
+    });
   }
 }
