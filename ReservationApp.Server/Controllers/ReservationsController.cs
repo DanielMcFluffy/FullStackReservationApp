@@ -87,7 +87,7 @@ namespace ReservationApp.Server.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, Reservation updatedReservation)
+        public async Task<IActionResult> Update(string id, [FromBody] ReservationNameRequest updatedReservationName)
         {
             var reservation = await _reservationsService.GetAsync(id);
 
@@ -96,7 +96,9 @@ namespace ReservationApp.Server.Controllers
                 return NotFound();
             }
 
-            await _reservationsService.UpdateAsync(id, updatedReservation);
+            reservation.guestname = updatedReservationName.name;
+
+            await _reservationsService.UpdateAsync(id, reservation);
 
             return NoContent();
         }

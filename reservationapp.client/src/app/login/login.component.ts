@@ -3,9 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { RegisterComponent } from '../register/register.component';
 import { AccountsService } from '../shared/accounts.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../shared/auth.service';
 import { TokenService } from '../shared/token.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,7 @@ export class LoginComponent implements OnInit {
   //success/error message for UI
   successMessage = this.accountsService.successMessage;
   errorMessage = this.accountsService.errorMessage;
+  mustSignInMessage = this.accountsService.mustSignInError;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -26,7 +28,9 @@ export class LoginComponent implements OnInit {
     private accountsService: AccountsService,
     private tokenService: TokenService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private location: Location,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -41,6 +45,7 @@ export class LoginComponent implements OnInit {
     this.accountsService.successMessage.set(false);
     this.accountsService.errorMessage.set(false);
     this.accountsService.usernameExistError.set(false);
+    this.accountsService.mustSignInError.set(false);
   }
 
   openDialog() {
@@ -75,14 +80,25 @@ export class LoginComponent implements OnInit {
         const { token, refreshToken } = authData;
         console.log(authData);
         // set token in localstorage
-        localStorage.setItem('accessToken', token!);
-        localStorage.setItem('refreshToken', refreshToken!);
+        this.tokenService.setAccessToken(token!);
+        this.tokenService.setRefreshToken(refreshToken!);
+        this.tokenService.getToken();
         if (token && refreshToken) {
           this.successMessage.set(true);
         }
         setTimeout(() => {
           this.dialog.closeAll();
-          this.router.navigate(['/landing']);
+          console.log(this.location.path());
+          this.location.path().includes('/login') ?
+          this.router.navigate(['/landing']) :
+          undefined;
+          if(this.location.path().includes('/listing')) {
+            const currentPath = this.location.path();
+            this.router.navigateByUrl('/RefreshComponent', { skipLocationChange: true }).then(() => {
+              this.router.navigateByUrl(currentPath);
+          }); 
+          }
+          
         }, 800);
       },
       (error) => {

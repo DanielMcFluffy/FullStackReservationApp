@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Signal, WritableSignal, computed, signal } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AuthData } from './models/auth';
@@ -13,12 +13,35 @@ export class TokenService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  private accessToken: WritableSignal<string| null> = localStorage.getItem('accessToken') ? signal(localStorage.getItem('accessToken')) : signal(null);
+  private refreshToken: WritableSignal<string | null> = localStorage.getItem('refreshToken') ? signal(localStorage.getItem('refreshToken')) : signal(null);
+
+
+  setAccessToken(token: string): void {
+    this.accessToken.set(token);
+    localStorage.setItem('accessToken', token);
+  }
+
+  setRefreshToken(token: string): void {
+    this.refreshToken.set(token);
+    localStorage.setItem('refreshToken', token);
+  }
+
   getToken(): string | null {
-    return localStorage.getItem('accessToken');
+    // return computed(() => this._accessToken);
+    return this.accessToken();
   }
 
   getRefreshToken(): string | null {
-    return localStorage.getItem('refreshToken');
+    // return computed(() => this._refreshToken);
+    return this.refreshToken();
+  }
+
+  clearTokens(): void {
+    this.accessToken.set(null);
+    this.refreshToken.set(null);
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   }
 
   requestAccessToken(): Observable<AuthData> {

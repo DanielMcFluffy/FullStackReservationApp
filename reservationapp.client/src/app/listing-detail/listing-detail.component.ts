@@ -9,6 +9,9 @@ import { addToCart } from '../features/store/checkout-actions';
 import { BookingDates } from '../shared/models/booking-dates';
 import { AppState } from '../features/store/app.state';
 import { ImageModalComponent } from './image-modal/image-modal.component';
+import { TokenService } from '../shared/token.service';
+import { LoginComponent } from '../login/login.component';
+import { AccountsService } from '../shared/accounts.service';
 
 @Component({
   selector: 'app-listing-detail',
@@ -21,7 +24,9 @@ export class ListingDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private listingsService: ListingsService,
     private dialog: MatDialog,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private tokenService: TokenService,
+    private accountsService: AccountsService
   ) {}
 
   listing!: Listings;
@@ -127,6 +132,10 @@ export class ListingDetailComponent implements OnInit {
   //dispatch addToCart action
   onAddToCart() {
     //extract dates received from calendar component
+    if (!this.tokenService.getToken()) {
+      this.accountsService.mustSignInError.set(true);
+      this.dialog.open(LoginComponent, {});
+    } else if (this.tokenService.getToken()) {
     const { checkInDate, checkOutDate } = this.bookingDates;
     this.store.dispatch(
       addToCart({
@@ -148,5 +157,5 @@ export class ListingDetailComponent implements OnInit {
 
     //programmatically navigate to the checkout page
     this.router.navigate(['checkout'], { relativeTo: this.route });
-  }
+  }}
 }

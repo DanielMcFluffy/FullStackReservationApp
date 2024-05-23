@@ -7,10 +7,11 @@
     <tr>
       <th>Reservation</th>
       <th>Listing Id</th>
+      <th>Reservation Name</th>
       <th>Email</th>
       <th>Check-In</th>
       <th>Check-Out</th>
-      <th>Booking Total</th>
+      <th style="text-wrap: nowrap ;">Booking Total</th>
 
     </tr>
   </thead>
@@ -27,6 +28,7 @@
         </div>
         </td>
       <td>{{ reservation.listing_id }}</td>
+      <td>{{ reservation.guestname }}</td>
       <td>{{ reservation.guestemail }}</td>
       <td>{{ reservation.checkindate | date }}</td>
       <td>{{ reservation.checkoutdate | date }}</td>

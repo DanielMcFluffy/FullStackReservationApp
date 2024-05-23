@@ -16,7 +16,9 @@ export class AccountsService {
   //success/error message for UI
   successMessage = signal(false);
   errorMessage = signal(false);
+  mustSignInError = signal(false);
   usernameExistError = signal(false);
+  
 
   username = this.tokenService.getToken()
     ? jwtDecode<{ username: string }>(this.tokenService.getToken() as string)
@@ -51,7 +53,6 @@ export class AccountsService {
   }
 
   logoutAccount() {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    this.tokenService.clearTokens();
   }
 }

@@ -56,6 +56,7 @@ namespace ReservationApp.Server.Services
                 {
                     Subject = GenerateClaims(AuthSettings.RefreshKey),
                     Expires = DateTime.UtcNow.AddHours(1), // Set token to expire after 1 hour
+
                     SigningCredentials = credentials
                 };
 

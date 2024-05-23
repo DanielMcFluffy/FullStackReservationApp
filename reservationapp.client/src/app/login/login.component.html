@@ -10,9 +10,16 @@
   <div>
     <div class="mt-5">
       <h2><strong>Login</strong></h2>
-      <div *ngIf="errorMessage()" class="alert alert-danger" role="alert">
-        Incorrect credentials!
-      </div>
+      @if (errorMessage()) {
+        <div class="alert alert-danger" role="alert">
+          Incorrect credentials!
+        </div>
+      }
+      @if (mustSignInMessage()) {
+        <div class="alert alert-danger" role="alert">
+          Please log in to make a booking.
+        </div>
+      }
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
         <div class="col">
           <label class="form-label">Email</label>

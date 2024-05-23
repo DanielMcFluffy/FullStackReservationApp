@@ -90,7 +90,7 @@ export class ReservationFormComponent implements OnInit {
       if (id) {
         //update reservation if exists
         this.reservationService
-          .updateReservation(id, reservation)
+          .updateReservationGuestName(id, reservation.guestname!)
           .subscribe(() => {
             //programmatically redirect user using the .router.navigate method
             this.router.navigate(['/list']);

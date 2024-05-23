@@ -7,6 +7,7 @@ import {
 } from 'firebase/auth';
 import { AccountsService } from './accounts.service';
 import { MatDialog } from '@angular/material/dialog';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,8 @@ export class AuthService {
   constructor(
     private firebaseAuth: Auth,
     private accountsService: AccountsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private tokenService: TokenService,
   ) {}
 
   // private checkAuthState(): void {
@@ -51,8 +53,8 @@ export class AuthService {
             const { token, refreshToken } = authData;
             console.log(authData);
 
-            localStorage.setItem('accessToken', token!);
-            localStorage.setItem('refreshToken', refreshToken!);
+            this.tokenService.setAccessToken(token!);
+            this.tokenService.setRefreshToken(refreshToken!);
             this.dialog.closeAll();
           });
         return result;

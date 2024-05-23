@@ -13,7 +13,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.tokenService.requestRefreshToken().subscribe((authData) => {
       const { refreshToken } = authData!;
-      localStorage.setItem('refreshToken', refreshToken!);
+      this.tokenService.setRefreshToken(refreshToken!);
     });
   }
 }

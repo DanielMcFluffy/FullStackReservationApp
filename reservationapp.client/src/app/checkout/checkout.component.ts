@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Reservation } from '../shared/models/reservation';
 import { editCart, payloadListing } from '../features/store/checkout-actions';
 import { Store } from '@ngrx/store';
@@ -28,6 +28,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     private reservationService: ReservationService,
     private router: Router
   ) {}
+
   // checkoutDetails$!: Observable<CheckoutState>;
   reservationDetails!: Reservation | null;
   listingDetails!: payloadListing | null;
@@ -36,7 +37,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   status!: string;
 
   //username(email) and id/uid from token
-  token!: string | null;
+  token!: string;
   username!: string;
   userId!: string;
 
@@ -78,10 +79,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.bookedDays = Math.ceil(
         (checkOutDate.valueOf() - checkInDate.valueOf()) / (1000 * 60 * 60 * 24)
       );
-    });
-
+    });    
     //extract out user info from the token
-    this.token = this.tokenService.getToken();
+    this.token = this.tokenService.getToken()!;
     if (this.token) {
       const { email, user_id } = jwtDecode<{
         email: string;
@@ -99,9 +99,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   onAddReservation() {
+    //reassign the token if user had login after failed
+    this.token = this.tokenService.getToken()!;
     console.log(this.reservationDetails, this.listingDetails, this.status);
     console.log(this.reservationName.value);
     console.log(this.reservationEmail.value);
+    console.log(this.token);
 
     if (this.reservationDetails && this.token && this.reservationName.dirty) {
       this.reservationService
@@ -110,7 +113,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           guestname: this.reservationName.value,
           guestemail: this.reservationEmail.value,
           user_id: this.userId!,
-          // token: this.token,
           listing_id: this.listingDetails!.id,
           listingDetails: this.listingDetails,
         })
