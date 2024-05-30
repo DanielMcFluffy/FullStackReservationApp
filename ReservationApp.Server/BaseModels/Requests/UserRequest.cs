@@ -1,4 +1,4 @@
-﻿namespace ReservationApp.Server.Requests
+﻿namespace ReservationApp.Server.BaseModels.Requests
 {
     public class UserRequest //the user only needs to type in these in for credentials
     {

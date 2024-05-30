@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Database.DBModels;
+using Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using ReservationApp.Server.Models;
-using ReservationApp.Server.Requests;
-using ReservationApp.Server.Services;
-using System.IdentityModel.Tokens.Jwt;
+using ReservationApp.Server.BaseModels.Requests;
 
 
 namespace ReservationApp.Server.Controllers
@@ -14,16 +12,16 @@ namespace ReservationApp.Server.Controllers
     [Route("reservations/")]
     public class ReservationsController : ControllerBase
     {
-        private readonly ReservationsService _reservationsService;
-        private readonly ListingsService _listingsService;
-        private readonly UsersService _usersService;
-        private readonly AuthService _authService;
+        private readonly IReservationsService _reservationsService;
+        private readonly IListingsService _listingsService;
+        private readonly IUsersService _usersService;
+        private readonly IAuthService _authService;
 
         public ReservationsController(
-            ReservationsService reservationsService,
-            ListingsService listingsService,
-            UsersService usersService,
-            AuthService authService)
+            IReservationsService reservationsService,
+            IListingsService listingsService,
+            IUsersService usersService,
+            IAuthService authService)
         {
             _reservationsService = reservationsService;
             _listingsService = listingsService;
@@ -96,7 +94,7 @@ namespace ReservationApp.Server.Controllers
                 return NotFound();
             }
 
-            reservation.guestname = updatedReservationName.name;
+            reservation.guestname = updatedReservationName.name!;
 
             await _reservationsService.UpdateAsync(id, reservation);
 

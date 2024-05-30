@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReservationApp.Server", "ReservationApp.Server\ReservationApp.Server.csproj", "{675E33A5-C08B-4369-9F86-1DD19222AEF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReservationApp.Server", "ReservationApp.Server\ReservationApp.Server.csproj", "{675E33A5-C08B-4369-9F86-1DD19222AEF6}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "reservationapp.client", "reservationapp.client\reservationapp.client.esproj", "{13E47CDA-88FF-4862-A229-FCD712B57337}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{C3CC874C-8E4B-405D-8B90-3425DDBF8939}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{27401B5C-0469-4503-9A8E-1E9FFFA2D87C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "Interfaces\Interfaces.csproj", "{49919F9D-756D-47FA-A023-11C86994FDBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +29,18 @@ Global
 		{13E47CDA-88FF-4862-A229-FCD712B57337}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13E47CDA-88FF-4862-A229-FCD712B57337}.Release|Any CPU.Build.0 = Release|Any CPU
 		{13E47CDA-88FF-4862-A229-FCD712B57337}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{C3CC874C-8E4B-405D-8B90-3425DDBF8939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3CC874C-8E4B-405D-8B90-3425DDBF8939}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3CC874C-8E4B-405D-8B90-3425DDBF8939}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3CC874C-8E4B-405D-8B90-3425DDBF8939}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27401B5C-0469-4503-9A8E-1E9FFFA2D87C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27401B5C-0469-4503-9A8E-1E9FFFA2D87C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27401B5C-0469-4503-9A8E-1E9FFFA2D87C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27401B5C-0469-4503-9A8E-1E9FFFA2D87C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49919F9D-756D-47FA-A023-11C86994FDBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49919F9D-756D-47FA-A023-11C86994FDBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49919F9D-756D-47FA-A023-11C86994FDBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49919F9D-756D-47FA-A023-11C86994FDBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,12 +1,12 @@
+using Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
-using ReservationApp.Server.Helpers;
-using ReservationApp.Server.Models;
-using ReservationApp.Server.Services;
+using ReservationApp.Server.BaseModels;
+using Services.AuthKey;
+using Services.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,12 +43,12 @@ builder.Services.AddSingleton<IMongoDatabase>(
     });
 
 //registers the services so we can inject it into their respective controllers
-builder.Services.AddSingleton<ListingsService>();
-builder.Services.AddSingleton<ReservationsService>();
-builder.Services.AddSingleton<UsersService>();
+builder.Services.AddSingleton<IListingsService, ListingsService>();
+builder.Services.AddSingleton<IReservationsService, ReservationsService>();
+builder.Services.AddSingleton<IUsersService, UsersService>();
 
 //we register the authservice
-builder.Services.AddTransient<AuthService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddHttpContextAccessor();
 
 //this middleware returns a delegate to futher configure the auth scheme
@@ -118,6 +118,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

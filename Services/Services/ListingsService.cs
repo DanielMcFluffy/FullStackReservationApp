@@ -1,18 +1,18 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Database.DBModels;
+using Interfaces;
 using MongoDB.Driver;
-using ReservationApp.Server.Models;
 
-namespace ReservationApp.Server.Services
+namespace Services.Services
 {
-    public class ListingsService
+    public class ListingsService : IListingsService
     {
         private readonly IMongoDatabase _database; //the singleton db entity that will be injected from the cosntructor
         private readonly IMongoCollection<Listing> _listingCollection; //we then inject the collection that is obtained from the IMongoDatabase DI
-        
+
         public ListingsService(
             IMongoDatabase database)
         {
-           _database = database; //initialize
+            _database = database; //initialize
 
             _listingCollection = _database.GetCollection<Listing>(
                 "Listings"); //initialize

@@ -1,4 +1,4 @@
-﻿namespace ReservationApp.Server.Models
+﻿namespace ReservationApp.Server.BaseModels
 {    //this class is used to store the appsettings.json file's BookStoreDatabase property values
     public class ReservationDatabaseSettings
     {

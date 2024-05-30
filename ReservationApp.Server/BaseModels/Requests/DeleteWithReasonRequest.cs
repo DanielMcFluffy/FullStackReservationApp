@@ -1,4 +1,4 @@
-﻿namespace ReservationApp.Server.Requests
+﻿namespace ReservationApp.Server.BaseModels.Requests
 {
     public class DeleteWithReasonRequest //this class will map our request object from the front-end to be passed to the controller 
     {

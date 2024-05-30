@@ -1,15 +1,15 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ReservationApp.Server.Models
+namespace Database.DBModels
 {
     public class payloadListing //this only carries the necessary information about the listing
     {
         public string id { get; set; } = null!;
         public string title { get; set; } = null!;
-        public long price { get; set; } 
+        public long price { get; set; }
         public string description { get; set; } = null!;
-        public string image1 { get; set; } = null!; 
+        public string image1 { get; set; } = null!;
     }
     [BsonIgnoreExtraElements] //add this if you're using mongodb atlas to store data -- on atlas db, we have an additional objectid field so this attribute ignores that and maps our models accurately
     public class Reservation
@@ -27,7 +27,7 @@ namespace ReservationApp.Server.Models
         public string checkoutdate { get; set; } = null!;
         public bool showreservation { get; set; } = true;
         public string? reasoncancel { get; set; }
-        public payloadListing? listingDetails { get; set; } 
+        public payloadListing? listingDetails { get; set; }
         public DateTime? datecreated { get; set; } = DateTime.UtcNow;
 
     }

@@ -1,19 +1,18 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Bson;
+﻿using Database.DBModels;
+using Interfaces;
 using MongoDB.Driver;
-using ReservationApp.Server.Models;
 
-namespace ReservationApp.Server.Services
+namespace Services.Services
 {
-    public class UsersService
+    public class UsersService : IUsersService
     {
         private readonly IMongoDatabase _database; //the singleton db entity that will be injected from the cosntructor
         private readonly IMongoCollection<User> _userCollection; //we then inject the collection that is obtained from the IMongoDatabase DI
-        
+
         public UsersService(
             IMongoDatabase database)
         {
-           _database = database; //initialize
+            _database = database; //initialize
 
             _userCollection = _database.GetCollection<User>(
                 "Users"); //initialize

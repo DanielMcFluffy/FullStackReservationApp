@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Database.DBModels;
+using Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using ReservationApp.Server.Models;
-using ReservationApp.Server.Requests;
-using ReservationApp.Server.Services;
-using System.Security.Cryptography;
+using ReservationApp.Server.BaseModels.Requests;
 using BC = BCrypt.Net.BCrypt;
 namespace ReservationApp.Server.Controllers
 {
@@ -13,11 +11,11 @@ namespace ReservationApp.Server.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UsersService _usersService;
-        private readonly AuthService _authService;
+        private readonly IUsersService _usersService;
+        private readonly IAuthService _authService;
 
-        public UsersController(UsersService usersService,
-            AuthService authService)
+        public UsersController(IUsersService usersService,
+            IAuthService authService)
         {
             _usersService = usersService;
             _authService = authService;

@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Database.DBModels;
+using Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using ReservationApp.Server.Models;
-using ReservationApp.Server.Services;
 
 namespace ReservationApp.Server.Controllers
 {
@@ -10,9 +9,9 @@ namespace ReservationApp.Server.Controllers
     [Route("listings")]
     public class ListingsController : ControllerBase
     {
-        private readonly ListingsService _listingsService;
+        private readonly IListingsService _listingsService;
 
-        public ListingsController(ListingsService listingsService)
+        public ListingsController(IListingsService listingsService)
         {
             _listingsService = listingsService;
         }

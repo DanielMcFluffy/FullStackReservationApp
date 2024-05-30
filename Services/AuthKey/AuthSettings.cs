@@ -1,4 +1,4 @@
-﻿namespace ReservationApp.Server.Helpers
+﻿namespace Services.AuthKey
 {
     public static class AuthSettings //for demonstration purposes, ideally store key in a key vault somewhere //we can use the appsettings instead to store the keys
     {

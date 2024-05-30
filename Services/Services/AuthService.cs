@@ -1,14 +1,15 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using ReservationApp.Server.Helpers;
-using ReservationApp.Server.Models;
+﻿using Database.DBModels;
+using Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
+using Services.AuthKey;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
-namespace ReservationApp.Server.Services
+namespace Services.Services
 {
-    public class AuthService //this class will take care of JWT token generation
+    public class AuthService: IAuthService //this class will take care of JWT token generation
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -48,7 +49,7 @@ namespace ReservationApp.Server.Services
         {
             var handler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(AuthSettings.RefreshKey); //again, this is an example -- keys should be stored privately
-            var credentials = new SigningCredentials( new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
+            var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
 
             var refreshToken = await Task.Run(() =>
             {
@@ -66,13 +67,13 @@ namespace ReservationApp.Server.Services
             return new Tuple<string, DateTime>(refreshToken, DateTime.UtcNow.AddHours(1)); //we return the refresh token and the time it expires so we can upload it to the db
         }
 
-        private static ClaimsIdentity GenerateClaims(User user)
+        public ClaimsIdentity GenerateClaims(User user)
         {
             var claims = new ClaimsIdentity(); //initialize a claim
 
             //here we add add the username(email) as a claim
             claims.AddClaim(new Claim(ClaimTypes.Email, user.username));
-            
+
             //if uid exists, it implies it's from an OAuth account, use that instead
             var userIdClaimValue = string.IsNullOrEmpty(user.uid) ? user.id : user.uid;
 
@@ -89,7 +90,7 @@ namespace ReservationApp.Server.Services
 
         }
 
-        private static ClaimsIdentity GenerateClaims(string refreshKey)
+        public ClaimsIdentity GenerateClaims(string refreshKey)
         {
             var claims = new ClaimsIdentity(); //initialize a claim
 
@@ -101,24 +102,24 @@ namespace ReservationApp.Server.Services
 
         public async Task<string> DecodeTokenClaimFromHeader(string claimType)
         {
-           var claim = await Task.Run(() =>
-            {
-                //we'll receive the token from the body and decode it
-                var tokenWithBearer = _httpContextAccessor.HttpContext!.Request.Headers["Authorization"].FirstOrDefault();
-                if (string.IsNullOrEmpty(tokenWithBearer))
-                {
-                    throw new ArgumentException("Missing Authorization Header");
-                }
+            var claim = await Task.Run(() =>
+             {
+                 //we'll receive the token from the body and decode it
+                 var tokenWithBearer = _httpContextAccessor.HttpContext!.Request.Headers["Authorization"].FirstOrDefault();
+                 if (string.IsNullOrEmpty(tokenWithBearer))
+                 {
+                     throw new ArgumentException("Missing Authorization Header");
+                 }
 
-                // Remove "Bearer " from the token
-                var token = tokenWithBearer.Replace("Bearer ", "");
+                 // Remove "Bearer " from the token
+                 var token = tokenWithBearer.Replace("Bearer ", "");
 
-                // Decode the token
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var securityToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+                 // Decode the token
+                 var tokenHandler = new JwtSecurityTokenHandler();
+                 var securityToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
 
-                return securityToken!.Claims.First(claim => claim.Type == claimType);
-            });
+                 return securityToken!.Claims.First(claim => claim.Type == claimType);
+             });
 
             return claim.Value;
         }

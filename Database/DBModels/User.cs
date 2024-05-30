@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ReservationApp.Server.Models
+namespace Database.DBModels
 {
     [BsonIgnoreExtraElements] //add this if you're using mongodb atlas to store data -- on atlas db, we have an additional objectid field so this attribute ignores that and maps our models accurately
     public class User
